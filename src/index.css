@@ -1,5 +1,9 @@
 @import './styles/theme.css';
 
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -7,15 +11,55 @@
 a {
   text-decoration: none;
   color: inherit;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--accent-primary);
 }
 
 button {
   font-family: inherit;
 }
 
-/* Scrollbar styling for webkit */
+/* Enhanced Input Styling */
+input,
+select,
+textarea {
+  font-family: inherit;
+  transition: all var(--transition-base);
+}
+
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  background: var(--bg-input);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  outline: none;
+  width: 100%;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: rgba(15, 23, 42, 0.8);
+}
+
+input:not([type="checkbox"]):not([type="radio"])::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Enhanced Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -25,8 +69,9 @@ button {
 ::-webkit-scrollbar-thumb {
   background: var(--bg-card);
   border-radius: var(--radius-full);
+  border: 2px solid var(--bg-app);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: var(--accent-primary);
 }

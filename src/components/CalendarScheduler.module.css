@@ -1,0 +1,234 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.calendarCard {
+    padding: 1.5rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.navBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+
+.navBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+}
+
+.dayHeader {
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    padding-bottom: 0.5rem;
+}
+
+.day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+    border: 1px solid transparent;
+}
+
+.day:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.day.selected {
+    background: var(--accent-glow);
+    border-color: var(--accent-primary);
+    color: white;
+}
+
+.dimmed {
+    color: var(--text-muted);
+    opacity: 0.5;
+}
+
+.dots {
+    display: flex;
+    gap: 2px;
+    margin-top: 4px;
+}
+
+.dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--accent-secondary);
+}
+
+.completedDot {
+    background-color: var(--success);
+}
+
+.detailsSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.detailsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.detailsHeader h3 {
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.form {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.inputGroup label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.inputGroup input,
+.inputGroup select {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 0.75rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    outline: none;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+}
+
+.scheduleList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.emptyText {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2rem;
+}
+
+.scheduleItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    transition: opacity 0.2s;
+}
+
+.completedItem {
+    opacity: 0.6;
+}
+
+.scheduleLeft {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    flex: 1;
+}
+
+.checkIcon {
+    color: var(--success);
+}
+
+.circleIcon {
+    color: var(--text-muted);
+}
+
+.scheduleInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.schedulePeptide {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.scheduleDetails {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.deleteBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.2s;
+}
+
+.deleteBtn:hover {
+    color: var(--danger);
+}

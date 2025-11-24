@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Syringe, Info } from 'lucide-react';
 import styles from './ReconstitutionCalculator.module.css';
+import SyringeVisualizer from './SyringeVisualizer';
 
 const ReconstitutionCalculator = () => {
   const [vialAmount, setVialAmount] = useState(5); // mg
@@ -16,13 +17,13 @@ const ReconstitutionCalculator = () => {
     if (vialAmount > 0 && waterAmount > 0 && doseAmount > 0) {
       // Convert vial mg to mcg
       const totalMcg = vialAmount * 1000;
-      
+
       // Concentration (mcg per ml)
       const concentration = totalMcg / waterAmount;
-      
+
       // Volume to draw (ml)
       const drawMl = doseAmount / concentration;
-      
+
       // Units on U-100 syringe (1ml = 100 units)
       const units = drawMl * 100;
 
@@ -47,9 +48,9 @@ const ReconstitutionCalculator = () => {
         <div className={styles.inputGroup}>
           <label>
             Vial Quantity (mg)
-            <input 
-              type="number" 
-              value={vialAmount} 
+            <input
+              type="number"
+              value={vialAmount}
               onChange={(e) => setVialAmount(parseFloat(e.target.value) || 0)}
               step="1"
             />
@@ -59,9 +60,9 @@ const ReconstitutionCalculator = () => {
         <div className={styles.inputGroup}>
           <label>
             Bacteriostatic Water (ml)
-            <input 
-              type="number" 
-              value={waterAmount} 
+            <input
+              type="number"
+              value={waterAmount}
               onChange={(e) => setWaterAmount(parseFloat(e.target.value) || 0)}
               step="0.1"
             />
@@ -71,9 +72,9 @@ const ReconstitutionCalculator = () => {
         <div className={styles.inputGroup}>
           <label>
             Desired Dose (mcg)
-            <input 
-              type="number" 
-              value={doseAmount} 
+            <input
+              type="number"
+              value={doseAmount}
               onChange={(e) => setDoseAmount(parseFloat(e.target.value) || 0)}
               step="50"
             />
@@ -87,7 +88,9 @@ const ReconstitutionCalculator = () => {
               <span className={styles.resultValue}>{result.units}</span>
               <span className={styles.resultUnit}>Units (IU)</span>
             </div>
-            
+
+            <SyringeVisualizer units={parseFloat(result.units)} />
+
             <div className={styles.details}>
               <div className={styles.detailRow}>
                 <span>Volume:</span>

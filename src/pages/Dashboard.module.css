@@ -1,34 +1,83 @@
 .header {
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+    animation: fadeIn var(--transition-slow) ease-out;
+}
+
+.header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
 }
 
 .subtitle {
     color: var(--text-secondary);
-    margin-top: var(--space-xs);
+    margin-top: var(--space-sm);
+    font-size: 1rem;
 }
 
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-md);
-    margin-bottom: var(--space-xl);
+    gap: var(--space-lg);
+    margin-bottom: var(--space-2xl);
 }
 
 .summaryCard {
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
-    background: linear-gradient(145deg, var(--bg-card), rgba(30, 41, 59, 0.8));
+    background: linear-gradient(145deg, var(--bg-card), rgba(26, 31, 53, 0.8));
+    position: relative;
+    overflow: hidden;
+    animation: fadeIn var(--transition-slow) ease-out;
+    animation-fill-mode: both;
+}
+
+.summaryCard:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.summaryCard:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.summaryCard:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.summaryCard:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.summaryCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+.summaryCard:hover::before {
+    opacity: 1;
 }
 
 .cardIcon {
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, 0.05);
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(6, 182, 212, 0.2));
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
 .cardContent {
@@ -37,15 +86,19 @@
 }
 
 .label {
-    font-size: 0.8rem;
+    font-size: 0.8125rem;
     color: var(--text-secondary);
     margin-bottom: 4px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .value {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.75rem;
+    font-weight: 800;
     color: var(--text-primary);
+    line-height: 1.2;
 }
 
 .unit {
@@ -55,17 +108,22 @@
 }
 
 .subtext {
-    font-size: 0.8rem;
+    font-size: 0.8125rem;
     color: var(--accent-secondary);
+    font-weight: 500;
 }
 
 .section {
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+    animation: slideIn var(--transition-slow) ease-out;
+    animation-delay: 0.5s;
+    animation-fill-mode: both;
 }
 
 .section h3 {
-    margin-bottom: var(--space-md);
-    font-size: 1.1rem;
+    margin-bottom: var(--space-lg);
+    font-size: 1.25rem;
+    font-weight: 700;
     color: var(--text-primary);
 }
 
@@ -78,9 +136,27 @@
 .actionCard {
     display: flex;
     align-items: center;
-    gap: var(--space-md);
-    transition: transform 0.2s;
+    gap: var(--space-lg);
+    transition: all var(--transition-base);
     text-decoration: none;
+    position: relative;
+}
+
+.actionCard::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-full);
+    transition: height var(--transition-base);
+}
+
+.actionCard:hover::after {
+    height: 60%;
 }
 
 .actionCard:active {
@@ -88,30 +164,46 @@
 }
 
 .actionIcon {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-md);
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(6, 182, 212, 0.15));
+    transition: all var(--transition-base);
+}
+
+.actionCard:hover .actionIcon {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(6, 182, 212, 0.25));
+    transform: scale(1.05);
 }
 
 .actionText {
     flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 2px;
 }
 
 .actionTitle {
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 1rem;
     color: var(--text-primary);
 }
 
 .actionDesc {
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     color: var(--text-secondary);
+    line-height: 1.4;
 }
 
 .arrow {
     color: var(--text-muted);
+    transition: all var(--transition-base);
+}
+
+.actionCard:hover .arrow {
+    color: var(--accent-primary);
+    transform: translateX(4px);
 }
