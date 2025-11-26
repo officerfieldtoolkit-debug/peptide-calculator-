@@ -11,11 +11,11 @@ import {
     TestTube,
     Thermometer
 } from 'lucide-react';
-import { PEPTIDE_DATABASE } from '../data/peptideDatabase';
+import { usePeptides } from '../hooks/usePeptides';
 import styles from './PeptideEncyclopedia.module.css';
 
 const PeptideEncyclopedia = () => {
-    const peptides = useMemo(() => Object.values(PEPTIDE_DATABASE), []);
+    const { peptides, loading } = usePeptides();
     const categories = useMemo(() => ['All', ...new Set(peptides.map((p) => p.category))], [peptides]);
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -63,6 +63,10 @@ const PeptideEncyclopedia = () => {
         if (typeof window !== 'undefined' && window.innerWidth > 900) return;
         detailRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, [selectedPeptide]);
+
+    if (loading) {
+        return <div className="loading-screen">Loading encyclopedia...</div>;
+    }
 
     return (
         <div className={styles.container}>
@@ -127,9 +131,8 @@ const PeptideEncyclopedia = () => {
                         {filteredPeptides.map((peptide) => (
                             <button
                                 key={peptide.name}
-                                className={`${styles.peptideCard} ${
-                                    selectedPeptide?.name === peptide.name ? styles.activeCard : ''
-                                }`}
+                                className={`${styles.peptideCard} ${selectedPeptide?.name === peptide.name ? styles.activeCard : ''
+                                    }`}
                                 onClick={() => handleSelect(peptide)}
                             >
                                 <div className={styles.cardHeader}>
@@ -143,11 +146,12 @@ const PeptideEncyclopedia = () => {
                                 <div className={styles.cardMeta}>
                                     <span>
                                         <Thermometer size={16} />
-                                        {peptide.halfLife}
+                                        {peptide.half_life_hours} hours
                                     </span>
                                     <span>
                                         <TestTube size={16} />
-                                        {peptide.commonDosage}
+                                        {/* Common dosage is not in the DB schema yet, using description snippet or placeholder */}
+                                        See details
                                     </span>
                                 </div>
                                 <div className={styles.tags}>
@@ -171,11 +175,11 @@ const PeptideEncyclopedia = () => {
                                 <div className={styles.pills}>
                                     <span>
                                         <Thermometer size={16} />
-                                        {selectedPeptide.halfLife}
+                                        {selectedPeptide.half_life_hours} hours
                                     </span>
                                     <span>
                                         <TestTube size={16} />
-                                        {selectedPeptide.commonDosage}
+                                        See details
                                     </span>
                                 </div>
                             </div>
@@ -211,7 +215,7 @@ const PeptideEncyclopedia = () => {
                                 <div className={styles.sideEffectsBlock}>
                                     <p className={styles.label}>Side Effects</p>
                                     <ul>
-                                        {(selectedPeptide.sideEffects || []).map((item) => (
+                                        {(selectedPeptide.side_effects || []).map((item) => (
                                             <li key={item}>{item}</li>
                                         ))}
                                     </ul>

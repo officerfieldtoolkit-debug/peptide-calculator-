@@ -1,9 +1,24 @@
-import React, { useState } from 'react';
-import { User, Mail, Lock, Bell, Shield, Trash2, Download, Moon, Sun } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Shield, Bell, Database, Save, LogOut, AlertTriangle, Loader, Lock, Mail, Download, Trash2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 import styles from './Settings.module.css';
 
 const Settings = () => {
+    const { user, signOut } = useAuth();
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [message, setMessage] = useState(null);
     const [activeTab, setActiveTab] = useState('profile');
+
+    const [profile, setProfile] = useState({
+        full_name: '',
+        email: '',
+        age: '',
+        gender: 'prefer-not-to-say',
+        weight_goal: 'weight-loss'
+    });
+
     const [darkMode, setDarkMode] = useState(false);
     const [notifications, setNotifications] = useState({
         injectionReminders: true,
@@ -12,12 +27,84 @@ const Settings = () => {
         priceAlerts: false
     });
 
+    useEffect(() => {
+        if (user) {
+            fetchProfile();
+        }
+    }, [user]);
+
+    const fetchProfile = async () => {
+        try {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            if (error && error.code !== 'PGRST116') {
+                throw error;
+            }
+
+            if (data) {
+                setProfile({
+                    full_name: data.full_name || '',
+                    email: user.email,
+                    age: data.age || '',
+                    gender: data.gender || 'prefer-not-to-say',
+                    weight_goal: data.weight_goal || 'weight-loss'
+                });
+            } else {
+                // Initialize with email if no profile exists
+                setProfile(prev => ({ ...prev, email: user.email }));
+            }
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const updateProfile = async () => {
+        try {
+            setSaving(true);
+            setMessage(null);
+
+            const updates = {
+                id: user.id,
+                full_name: profile.full_name,
+                updated_at: new Date().toISOString()
+                // Add other fields to schema.sql if you want to persist them
+            };
+
+            const { error } = await supabase
+                .from('profiles')
+                .upsert(updates);
+
+            if (error) throw error;
+            setMessage({ type: 'success', text: 'Settings saved successfully' });
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            setMessage({ type: 'error', text: 'Failed to save settings' });
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const tabs = [
         { id: 'profile', label: 'Profile', icon: User },
         { id: 'security', label: 'Security', icon: Lock },
         { id: 'notifications', label: 'Notifications', icon: Bell },
         { id: 'privacy', label: 'Privacy & Data', icon: Shield }
     ];
+
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <Loader className="animate-spin" size={32} />
+            </div>
+        );
+    }
 
     return (
         <div className={styles.container}>
@@ -50,27 +137,45 @@ const Settings = () => {
 
                             <div className={styles.formGroup}>
                                 <label>Full Name</label>
-                                <input type="text" placeholder="John Doe" defaultValue="Trevor" />
+                                <input
+                                    type="text"
+                                    placeholder="John Doe"
+                                    value={profile.full_name}
+                                    onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                                />
                             </div>
 
                             <div className={styles.formGroup}>
                                 <label>Email Address</label>
                                 <div className={styles.inputWithIcon}>
                                     <Mail size={18} />
-                                    <input type="email" placeholder="your@email.com" defaultValue="trevor@example.com" />
+                                    <input
+                                        type="email"
+                                        value={profile.email}
+                                        disabled
+                                        className={styles.disabledInput}
+                                    />
                                 </div>
                             </div>
 
                             <div className={styles.formGroup}>
                                 <label>Age (Optional)</label>
-                                <input type="number" placeholder="30" />
+                                <input
+                                    type="number"
+                                    placeholder="30"
+                                    value={profile.age}
+                                    onChange={(e) => setProfile({ ...profile, age: e.target.value })}
+                                />
                                 <span className={styles.hint}>Used for personalized recommendations</span>
                             </div>
 
                             <div className={styles.formGroup}>
                                 <label>Gender (Optional)</label>
-                                <select>
-                                    <option value="">Prefer not to say</option>
+                                <select
+                                    value={profile.gender}
+                                    onChange={(e) => setProfile({ ...profile, gender: e.target.value })}
+                                >
+                                    <option value="prefer-not-to-say">Prefer not to say</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
                                     <option value="other">Other</option>
@@ -79,7 +184,10 @@ const Settings = () => {
 
                             <div className={styles.formGroup}>
                                 <label>Weight Goal</label>
-                                <select>
+                                <select
+                                    value={profile.weight_goal}
+                                    onChange={(e) => setProfile({ ...profile, weight_goal: e.target.value })}
+                                >
                                     <option value="weight-loss">Weight Loss</option>
                                     <option value="muscle-gain">Muscle Gain</option>
                                     <option value="recovery">Recovery & Healing</option>
@@ -89,7 +197,14 @@ const Settings = () => {
                                 </select>
                             </div>
 
-                            <button className="btn-primary">Save Changes</button>
+                            {message && (
+                                <div className={`alert ${message.type === 'error' ? 'alert-error' : 'alert-success'}`} style={{ marginBottom: '1rem', padding: '10px', borderRadius: '8px', background: message.type === 'error' ? 'rgba(255,0,0,0.1)' : 'rgba(0,255,0,0.1)', color: message.type === 'error' ? '#ff4d4d' : '#4dff4d' }}>
+                                    {message.text}
+                                </div>
+                            )}
+                            <button className="btn-primary" onClick={updateProfile} disabled={saving}>
+                                {saving ? 'Saving...' : 'Save Changes'}
+                            </button>
                         </div>
                     )}
 
@@ -144,7 +259,7 @@ const Settings = () => {
                                 </div>
                             </div>
 
-                            <button className={styles.dangerBtn}>Sign Out All Devices</button>
+                            <button className={styles.dangerBtn} onClick={signOut}>Sign Out All Devices</button>
                         </div>
                     )}
 

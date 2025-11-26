@@ -3,7 +3,11 @@ import { Syringe, Info } from 'lucide-react';
 import styles from './ReconstitutionCalculator.module.css';
 import SyringeVisualizer from './SyringeVisualizer';
 
+import { usePeptides } from '../hooks/usePeptides';
+
 const ReconstitutionCalculator = () => {
+  const { peptides } = usePeptides();
+  const [selectedPeptide, setSelectedPeptide] = useState('');
   const [vialAmount, setVialAmount] = useState(5); // mg
   const [waterAmount, setWaterAmount] = useState(1); // ml
   const [doseAmount, setDoseAmount] = useState(250); // mcg
@@ -43,6 +47,22 @@ const ReconstitutionCalculator = () => {
         <div className={styles.header}>
           <Syringe className={styles.icon} size={24} />
           <h2>Peptide Calculator</h2>
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label>
+            Select Peptide (Optional)
+            <select
+              value={selectedPeptide}
+              onChange={(e) => setSelectedPeptide(e.target.value)}
+              className={styles.select}
+            >
+              <option value="">Custom / Other</option>
+              {peptides.map(p => (
+                <option key={p.id} value={p.name}>{p.name}</option>
+              ))}
+            </select>
+          </label>
         </div>
 
         <div className={styles.inputGroup}>

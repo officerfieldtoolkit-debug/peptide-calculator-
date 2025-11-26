@@ -1,15 +1,29 @@
 import React, { useState } from 'react';
-import { LogIn } from 'lucide-react';
+import { LogIn, AlertCircle } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const { signIn } = useAuth();
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Mock login functionality
-        console.log('Login attempt:', { email, password });
-        alert('This is a demo login. No actual authentication is implemented yet.');
+        setLoading(true);
+        setError(null);
+
+        try {
+            await signIn(email, password);
+            navigate('/');
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -35,6 +49,24 @@ const Login = () => {
                     <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '600' }}>Welcome Back</h2>
                     <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Sign in to continue</p>
                 </div>
+
+                {error && (
+                    <div style={{
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                        color: '#ef4444',
+                        padding: '0.75rem',
+                        borderRadius: 'var(--radius-md)',
+                        marginBottom: '1.5rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        fontSize: '0.875rem'
+                    }}>
+                        <AlertCircle size={16} />
+                        <span>{error}</span>
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -82,17 +114,20 @@ const Login = () => {
                     <button
                         type="submit"
                         className="btn-primary"
+                        disabled={loading}
                         style={{
                             marginTop: '1rem',
                             width: '100%',
                             display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'center',
-                            gap: '0.5rem'
+                            gap: '0.5rem',
+                            opacity: loading ? 0.7 : 1,
+                            cursor: loading ? 'not-allowed' : 'pointer'
                         }}
                     >
-                        <span>Sign In</span>
-                        <LogIn size={18} />
+                        <span>{loading ? 'Signing in...' : 'Sign In'}</span>
+                        {!loading && <LogIn size={18} />}
                     </button>
                 </form>
             </div>
