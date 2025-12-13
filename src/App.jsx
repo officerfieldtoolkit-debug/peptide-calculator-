@@ -6,6 +6,8 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Tracker from './pages/Tracker';
 import Login from './pages/Login';
+import SignUp from './pages/SignUp';
+import ForgotPassword from './pages/ForgotPassword';
 import Settings from './pages/Settings';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
@@ -57,6 +59,8 @@ function App() {
               </Suspense>
             } />
             <Route path="login" element={<Login />} />
+            <Route path="signup" element={<SignUp />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
             <Route path="schedule" element={
               <Suspense fallback={<div style={{ padding: '20px' }}>Loading schedule...</div>}>
                 <Schedule />

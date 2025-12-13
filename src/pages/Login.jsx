@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
-import { LogIn, AlertCircle } from 'lucide-react';
+import { LogIn, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const { signIn, mockLogin } = useAuth();
+    const { signIn } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Get the page user was trying to access before being redirected to login
+    const from = location.state?.from?.pathname || '/';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -18,12 +23,32 @@ const Login = () => {
 
         try {
             await signIn(email, password);
-            navigate('/');
+            navigate(from, { replace: true });
         } catch (err) {
-            setError(err.message);
+            // Make error messages more user-friendly
+            if (err.message.includes('Invalid login credentials')) {
+                setError('Invalid email or password. Please try again.');
+            } else if (err.message.includes('Email not confirmed')) {
+                setError('Please check your email and confirm your account before logging in.');
+            } else {
+                setError(err.message);
+            }
         } finally {
             setLoading(false);
         }
+    };
+
+    const inputStyle = {
+        background: 'rgba(15, 23, 42, 0.5)',
+        border: '1px solid var(--glass-border)',
+        borderRadius: 'var(--radius-md)',
+        padding: '0.75rem 1rem',
+        color: 'var(--text-primary)',
+        fontSize: '1rem',
+        outline: 'none',
+        transition: 'border-color 0.2s, box-shadow 0.2s',
+        width: '100%',
+        boxSizing: 'border-box'
     };
 
     return (
@@ -47,7 +72,7 @@ const Login = () => {
                         <LogIn size={32} color="var(--accent-primary)" />
                     </div>
                     <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '600' }}>Welcome Back</h2>
-                    <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Sign in to continue</p>
+                    <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Sign in to your account</p>
                 </div>
 
                 {error && (
@@ -68,7 +93,7 @@ const Login = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         <label style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)' }}>Email</label>
                         <input
@@ -76,39 +101,61 @@ const Login = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="Enter your email"
-                            style={{
-                                background: 'rgba(15, 23, 42, 0.5)',
-                                border: '1px solid var(--glass-border)',
-                                borderRadius: 'var(--radius-md)',
-                                padding: '0.75rem 1rem',
-                                color: 'var(--text-primary)',
-                                fontSize: '1rem',
-                                outline: 'none',
-                                transition: 'border-color 0.2s'
-                            }}
+                            style={inputStyle}
                             required
+                            autoComplete="email"
                         />
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)' }}>Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Enter your password"
-                            style={{
-                                background: 'rgba(15, 23, 42, 0.5)',
-                                border: '1px solid var(--glass-border)',
-                                borderRadius: 'var(--radius-md)',
-                                padding: '0.75rem 1rem',
-                                color: 'var(--text-primary)',
-                                fontSize: '1rem',
-                                outline: 'none',
-                                transition: 'border-color 0.2s'
-                            }}
-                            required
-                        />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <label style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)' }}>Password</label>
+                            <Link
+                                to="/forgot-password"
+                                style={{
+                                    fontSize: '0.75rem',
+                                    color: 'var(--accent-primary)',
+                                    textDecoration: 'none'
+                                }}
+                            >
+                                Forgot password?
+                            </Link>
+                        </div>
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Enter your password"
+                                style={{
+                                    ...inputStyle,
+                                    paddingRight: '3rem'
+                                }}
+                                required
+                                autoComplete="current-password"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: '0.75rem',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    padding: '0.25rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'var(--text-tertiary)'
+                                }}
+                                tabIndex={-1}
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
                     </div>
 
                     <button
@@ -116,7 +163,7 @@ const Login = () => {
                         className="btn-primary"
                         disabled={loading}
                         style={{
-                            marginTop: '1rem',
+                            marginTop: '0.5rem',
                             width: '100%',
                             display: 'flex',
                             justifyContent: 'center',
@@ -129,19 +176,28 @@ const Login = () => {
                         <span>{loading ? 'Signing in...' : 'Sign In'}</span>
                         {!loading && <LogIn size={18} />}
                     </button>
-
-                    <button
-                        type="button"
-                        onClick={() => {
-                            mockLogin();
-                            navigate('/');
-                        }}
-                        className="btn-secondary"
-                        style={{ width: '100%', marginTop: '0.5rem' }}
-                    >
-                        Demo Login (No Auth Required)
-                    </button>
                 </form>
+
+                <div style={{
+                    marginTop: '1.5rem',
+                    paddingTop: '1.5rem',
+                    borderTop: '1px solid var(--glass-border)',
+                    textAlign: 'center'
+                }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                        Don't have an account?{' '}
+                        <Link
+                            to="/signup"
+                            style={{
+                                color: 'var(--accent-primary)',
+                                textDecoration: 'none',
+                                fontWeight: '500'
+                            }}
+                        >
+                            Create one
+                        </Link>
+                    </p>
+                </div>
             </div>
         </div>
     );
