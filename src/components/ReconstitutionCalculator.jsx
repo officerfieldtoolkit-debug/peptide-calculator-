@@ -1,146 +1,476 @@
-import React, { useState, useEffect } from 'react';
-import { Syringe, Info } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { Syringe, Info, ChevronDown, Bookmark, BookmarkCheck, Trash2, RotateCcw, Beaker, Droplets, FlaskConical } from 'lucide-react';
 import styles from './ReconstitutionCalculator.module.css';
 import SyringeVisualizer from './SyringeVisualizer';
+import { PEPTIDE_DATABASE } from '../data/peptideDatabase';
 
-import { usePeptides } from '../hooks/usePeptides';
+// Local storage key for saved calculations
+const SAVED_CALCS_KEY = 'peptide_saved_calculations';
+
+// Get peptide names for autocomplete
+const PEPTIDE_NAMES = Object.keys(PEPTIDE_DATABASE);
+
+// Syringe types
+const SYRINGE_TYPES = [
+  { id: 'u100', name: 'U-100 (1ml)', unitsPerMl: 100, maxUnits: 100 },
+  { id: 'u50', name: 'U-50 (0.5ml)', unitsPerMl: 100, maxUnits: 50 },
+  { id: 'u40', name: 'U-40', unitsPerMl: 40, maxUnits: 40 },
+];
+
+// Common water amounts
+const COMMON_WATER_AMOUNTS = [0.5, 1, 1.5, 2, 2.5, 3];
+
+// Get saved calculations from localStorage
+const getSavedCalculations = () => {
+  try {
+    const saved = localStorage.getItem(SAVED_CALCS_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+};
 
 const ReconstitutionCalculator = () => {
-  const { peptides } = usePeptides();
+  // Form state
   const [selectedPeptide, setSelectedPeptide] = useState('');
-  const [vialAmount, setVialAmount] = useState(5); // mg
-  const [waterAmount, setWaterAmount] = useState(1); // ml
-  const [doseAmount, setDoseAmount] = useState(250); // mcg
-  const [result, setResult] = useState(null);
+  const [vialAmount, setVialAmount] = useState(5);
+  const [waterAmount, setWaterAmount] = useState(2);
+  const [doseAmount, setDoseAmount] = useState(250);
+  const [doseUnit, setDoseUnit] = useState('mcg'); // 'mcg' or 'mg'
+  const [syringeType, setSyringeType] = useState('u100');
 
-  useEffect(() => {
-    calculate();
-  }, [vialAmount, waterAmount, doseAmount]);
+  // UI state
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [savedCalcs, setSavedCalcs] = useState(getSavedCalculations);
+  const [showSaved, setShowSaved] = useState(false);
+  const autocompleteRef = useRef(null);
 
-  const calculate = () => {
-    if (vialAmount > 0 && waterAmount > 0 && doseAmount > 0) {
-      // Convert vial mg to mcg
-      const totalMcg = vialAmount * 1000;
+  // Filter peptides for autocomplete
+  const filteredPeptides = useMemo(() => {
+    if (!selectedPeptide) return PEPTIDE_NAMES.slice(0, 8);
+    const search = selectedPeptide.toLowerCase();
+    return PEPTIDE_NAMES.filter(name =>
+      name.toLowerCase().includes(search)
+    ).slice(0, 8);
+  }, [selectedPeptide]);
 
-      // Concentration (mcg per ml)
-      const concentration = totalMcg / waterAmount;
+  // Get selected peptide data
+  const peptideData = useMemo(() => {
+    return PEPTIDE_DATABASE[selectedPeptide] || null;
+  }, [selectedPeptide]);
 
-      // Volume to draw (ml)
-      const drawMl = doseAmount / concentration;
+  // Get common doses for selected peptide
+  const commonDoses = useMemo(() => {
+    if (!peptideData) return [100, 250, 500, 1000];
 
-      // Units on U-100 syringe (1ml = 100 units)
-      const units = drawMl * 100;
-
-      setResult({
-        concentration: concentration,
-        drawMl: drawMl.toFixed(3),
-        units: units.toFixed(1)
-      });
-    } else {
-      setResult(null);
+    // Parse from commonDosage string (e.g., "250-500mcg daily")
+    const dosageStr = peptideData.commonDosage || '';
+    const matches = dosageStr.match(/(\d+(?:\.\d+)?)/g);
+    if (matches && matches.length > 0) {
+      // Convert to numbers and return unique values
+      const doses = matches.map(m => parseFloat(m));
+      // If doses are in mg (less than 10), convert to mcg for display
+      if (doses[0] < 10 && dosageStr.toLowerCase().includes('mg')) {
+        return doses.map(d => d * 1000);
+      }
+      return doses;
     }
+    return [100, 250, 500, 1000];
+  }, [peptideData]);
+
+  // Close autocomplete on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (autocompleteRef.current && !autocompleteRef.current.contains(e.target)) {
+        setShowAutocomplete(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Calculate result
+  const result = useMemo(() => {
+    if (vialAmount <= 0 || waterAmount <= 0 || doseAmount <= 0) return null;
+
+    const syringe = SYRINGE_TYPES.find(s => s.id === syringeType);
+    const unitsPerMl = syringe?.unitsPerMl || 100;
+    const maxUnits = syringe?.maxUnits || 100;
+
+    // Convert dose to mcg if needed
+    const doseMcg = doseUnit === 'mg' ? doseAmount * 1000 : doseAmount;
+
+    // Convert vial mg to mcg
+    const totalMcg = vialAmount * 1000;
+
+    // Concentration (mcg per ml)
+    const concentration = totalMcg / waterAmount;
+
+    // Volume to draw (ml)
+    const drawMl = doseMcg / concentration;
+
+    // Units on syringe
+    const units = drawMl * unitsPerMl;
+
+    // Number of doses per vial
+    const dosesPerVial = Math.floor(totalMcg / doseMcg);
+
+    // Check if dose is possible with selected syringe
+    const isOverMax = units > maxUnits;
+
+    return {
+      concentration,
+      drawMl: drawMl.toFixed(4),
+      units: units.toFixed(1),
+      dosesPerVial,
+      isOverMax,
+      maxUnits
+    };
+  }, [vialAmount, waterAmount, doseAmount, doseUnit, syringeType]);
+
+  // Select peptide and auto-fill common values
+  const selectPeptide = (name) => {
+    setSelectedPeptide(name);
+    setShowAutocomplete(false);
+
+    const peptide = PEPTIDE_DATABASE[name];
+    if (peptide) {
+      // Try to parse common dosage
+      const dosageStr = peptide.commonDosage || '';
+      const matches = dosageStr.match(/(\d+(?:\.\d+)?)/g);
+      if (matches && matches.length > 0) {
+        const dose = parseFloat(matches[0]);
+        if (dosageStr.toLowerCase().includes('mg') && dose < 10) {
+          setDoseAmount(dose);
+          setDoseUnit('mg');
+        } else {
+          setDoseAmount(dose);
+          setDoseUnit('mcg');
+        }
+      }
+    }
+  };
+
+  // Save current calculation
+  const saveCalculation = () => {
+    const newCalc = {
+      id: Date.now(),
+      peptide: selectedPeptide || 'Custom',
+      vialAmount,
+      waterAmount,
+      doseAmount,
+      doseUnit,
+      syringeType
+    };
+
+    const updated = [newCalc, ...savedCalcs.slice(0, 9)]; // Keep max 10
+    setSavedCalcs(updated);
+    localStorage.setItem(SAVED_CALCS_KEY, JSON.stringify(updated));
+  };
+
+  // Load saved calculation
+  const loadCalculation = (calc) => {
+    setSelectedPeptide(calc.peptide);
+    setVialAmount(calc.vialAmount);
+    setWaterAmount(calc.waterAmount);
+    setDoseAmount(calc.doseAmount);
+    setDoseUnit(calc.doseUnit || 'mcg');
+    setSyringeType(calc.syringeType || 'u100');
+    setShowSaved(false);
+  };
+
+  // Delete saved calculation
+  const deleteCalculation = (id) => {
+    const updated = savedCalcs.filter(c => c.id !== id);
+    setSavedCalcs(updated);
+    localStorage.setItem(SAVED_CALCS_KEY, JSON.stringify(updated));
+  };
+
+  // Reset to defaults
+  const resetCalculator = () => {
+    setSelectedPeptide('');
+    setVialAmount(5);
+    setWaterAmount(2);
+    setDoseAmount(250);
+    setDoseUnit('mcg');
+    setSyringeType('u100');
   };
 
   return (
     <div className={styles.container}>
-      <div className="card glass-panel">
-        <div className={styles.header}>
-          <Syringe className={styles.icon} size={24} />
-          <h2>Peptide Calculator</h2>
+      {/* Header */}
+      <div className={styles.pageHeader}>
+        <div className={styles.headerLeft}>
+          <FlaskConical size={28} className={styles.headerIcon} />
+          <div>
+            <h1>Reconstitution Calculator</h1>
+            <p>Calculate exact syringe draw volumes</p>
+          </div>
         </div>
+        <div className={styles.headerActions}>
+          <button
+            className={`${styles.iconBtn} ${showSaved ? styles.iconBtnActive : ''}`}
+            onClick={() => setShowSaved(!showSaved)}
+            title="Saved calculations"
+          >
+            <Bookmark size={20} />
+            {savedCalcs.length > 0 && <span className={styles.badge}>{savedCalcs.length}</span>}
+          </button>
+          <button className={styles.iconBtn} onClick={resetCalculator} title="Reset">
+            <RotateCcw size={20} />
+          </button>
+        </div>
+      </div>
 
-        <div className={styles.inputGroup}>
-          <label>
-            Select Peptide (Optional)
-            <select
+      {/* Saved Calculations Panel */}
+      {showSaved && (
+        <div className={`card glass-panel ${styles.savedPanel}`}>
+          <h3>Saved Calculations</h3>
+          {savedCalcs.length === 0 ? (
+            <p className={styles.noSaved}>No saved calculations yet</p>
+          ) : (
+            <div className={styles.savedList}>
+              {savedCalcs.map(calc => (
+                <div key={calc.id} className={styles.savedItem}>
+                  <button className={styles.savedItemBtn} onClick={() => loadCalculation(calc)}>
+                    <span className={styles.savedPeptide}>{calc.peptide}</span>
+                    <span className={styles.savedDetails}>
+                      {calc.vialAmount}mg / {calc.waterAmount}ml → {calc.doseAmount}{calc.doseUnit}
+                    </span>
+                  </button>
+                  <button className={styles.deleteBtn} onClick={() => deleteCalculation(calc.id)}>
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Main Calculator Card */}
+      <div className="card glass-panel">
+        {/* Peptide Selection with Autocomplete */}
+        <div className={styles.inputGroup} ref={autocompleteRef}>
+          <label className={styles.label}>
+            <Beaker size={16} />
+            Peptide
+          </label>
+          <div className={styles.autocompleteWrapper}>
+            <input
+              type="text"
+              placeholder="Search or type peptide name..."
               value={selectedPeptide}
               onChange={(e) => setSelectedPeptide(e.target.value)}
-              className={styles.select}
-            >
-              <option value="">Custom / Other</option>
-              {peptides.map(p => (
-                <option key={p.id} value={p.name}>{p.name}</option>
-              ))}
-            </select>
-          </label>
+              onFocus={() => setShowAutocomplete(true)}
+              className={styles.input}
+              autoComplete="off"
+            />
+            <ChevronDown
+              size={18}
+              className={`${styles.chevron} ${showAutocomplete ? styles.chevronUp : ''}`}
+            />
+            {showAutocomplete && filteredPeptides.length > 0 && (
+              <div className={styles.autocomplete}>
+                {filteredPeptides.map(name => (
+                  <button
+                    key={name}
+                    type="button"
+                    className={styles.autocompleteItem}
+                    onClick={() => selectPeptide(name)}
+                  >
+                    <span>{name}</span>
+                    <span className={styles.peptideCategory}>
+                      {PEPTIDE_DATABASE[name]?.category}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {peptideData && (
+            <p className={styles.peptideHint}>
+              Common: {peptideData.commonDosage}
+            </p>
+          )}
         </div>
 
+        {/* Vial Amount */}
         <div className={styles.inputGroup}>
-          <label>
-            Vial Quantity (mg)
+          <label className={styles.label}>
+            <FlaskConical size={16} />
+            Vial Quantity
+          </label>
+          <div className={styles.inputWithUnit}>
             <input
               type="number"
               value={vialAmount}
-              onChange={(e) => {
-                const value = e.target.value;
-                // Allow empty string for clearing, otherwise parse as float
-                setVialAmount(value === '' ? 0 : parseFloat(value) || 0);
-              }}
-              onWheel={(e) => e.target.blur()} // Prevent scroll from changing value
+              onChange={(e) => setVialAmount(parseFloat(e.target.value) || 0)}
+              onWheel={(e) => e.target.blur()}
               step="1"
+              min="0"
+              className={styles.input}
             />
-          </label>
+            <span className={styles.unitLabel}>mg</span>
+          </div>
+          <div className={styles.quickButtons}>
+            {[5, 10, 15, 20].map(v => (
+              <button
+                key={v}
+                className={`${styles.quickBtn} ${vialAmount === v ? styles.quickBtnActive : ''}`}
+                onClick={() => setVialAmount(v)}
+              >
+                {v}mg
+              </button>
+            ))}
+          </div>
         </div>
 
+        {/* Water Amount */}
         <div className={styles.inputGroup}>
-          <label>
-            Bacteriostatic Water (ml)
+          <label className={styles.label}>
+            <Droplets size={16} />
+            Bacteriostatic Water
+          </label>
+          <div className={styles.inputWithUnit}>
             <input
               type="number"
               value={waterAmount}
-              onChange={(e) => {
-                const value = e.target.value;
-                setWaterAmount(value === '' ? 0 : parseFloat(value) || 0);
-              }}
+              onChange={(e) => setWaterAmount(parseFloat(e.target.value) || 0)}
               onWheel={(e) => e.target.blur()}
-              step="0.1"
+              step="0.5"
+              min="0"
+              className={styles.input}
             />
-          </label>
+            <span className={styles.unitLabel}>ml</span>
+          </div>
+          <div className={styles.quickButtons}>
+            {COMMON_WATER_AMOUNTS.map(w => (
+              <button
+                key={w}
+                className={`${styles.quickBtn} ${waterAmount === w ? styles.quickBtnActive : ''}`}
+                onClick={() => setWaterAmount(w)}
+              >
+                {w}ml
+              </button>
+            ))}
+          </div>
         </div>
 
+        {/* Desired Dose */}
         <div className={styles.inputGroup}>
-          <label>
-            Desired Dose (mcg)
+          <label className={styles.label}>
+            <Syringe size={16} />
+            Desired Dose
+          </label>
+          <div className={styles.doseInputRow}>
             <input
               type="number"
               value={doseAmount}
-              onChange={(e) => {
-                const value = e.target.value;
-                setDoseAmount(value === '' ? 0 : parseFloat(value) || 0);
-              }}
+              onChange={(e) => setDoseAmount(parseFloat(e.target.value) || 0)}
               onWheel={(e) => e.target.blur()}
-              step="50"
+              step={doseUnit === 'mg' ? '0.1' : '50'}
+              min="0"
+              className={styles.input}
             />
-          </label>
+            <div className={styles.unitToggle}>
+              <button
+                className={`${styles.unitBtn} ${doseUnit === 'mcg' ? styles.unitBtnActive : ''}`}
+                onClick={() => setDoseUnit('mcg')}
+              >
+                mcg
+              </button>
+              <button
+                className={`${styles.unitBtn} ${doseUnit === 'mg' ? styles.unitBtnActive : ''}`}
+                onClick={() => setDoseUnit('mg')}
+              >
+                mg
+              </button>
+            </div>
+          </div>
+          <div className={styles.quickButtons}>
+            {commonDoses.map(d => (
+              <button
+                key={d}
+                className={`${styles.quickBtn} ${doseAmount === d && doseUnit === 'mcg' ? styles.quickBtnActive : ''}`}
+                onClick={() => { setDoseAmount(d); setDoseUnit('mcg'); }}
+              >
+                {d >= 1000 ? `${d / 1000}mg` : `${d}mcg`}
+              </button>
+            ))}
+          </div>
         </div>
 
+        {/* Syringe Type */}
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>Syringe Type</label>
+          <div className={styles.syringeTypes}>
+            {SYRINGE_TYPES.map(s => (
+              <button
+                key={s.id}
+                className={`${styles.syringeBtn} ${syringeType === s.id ? styles.syringeBtnActive : ''}`}
+                onClick={() => setSyringeType(s.id)}
+              >
+                {s.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Results */}
         {result && (
           <div className={styles.resultContainer}>
+            {result.isOverMax && (
+              <div className={styles.warning}>
+                ⚠️ Dose exceeds syringe capacity ({result.maxUnits} units max).
+                Use more water or a larger syringe.
+              </div>
+            )}
+
             <div className={styles.resultCard}>
               <span className={styles.resultLabel}>Draw to Tick Mark</span>
-              <span className={styles.resultValue}>{result.units}</span>
-              <span className={styles.resultUnit}>Units (IU)</span>
+              <span className={`${styles.resultValue} ${result.isOverMax ? styles.resultWarning : ''}`}>
+                {result.units}
+              </span>
+              <span className={styles.resultUnit}>Units</span>
             </div>
 
-            <SyringeVisualizer units={parseFloat(result.units)} />
+            <SyringeVisualizer
+              units={Math.min(parseFloat(result.units), result.maxUnits)}
+              maxUnits={result.maxUnits}
+            />
 
             <div className={styles.details}>
               <div className={styles.detailRow}>
-                <span>Volume:</span>
+                <span>Volume to Draw:</span>
                 <span>{result.drawMl} ml</span>
               </div>
               <div className={styles.detailRow}>
                 <span>Concentration:</span>
-                <span>{result.concentration} mcg/ml</span>
+                <span>{result.concentration.toFixed(1)} mcg/ml</span>
+              </div>
+              <div className={styles.detailRow}>
+                <span>Doses per Vial:</span>
+                <span className={styles.dosesValue}>{result.dosesPerVial} doses</span>
               </div>
             </div>
+
+            <button className={styles.saveBtn} onClick={saveCalculation}>
+              <BookmarkCheck size={18} />
+              Save This Calculation
+            </button>
           </div>
         )}
       </div>
 
+      {/* Info Box */}
       <div className={styles.infoBox}>
         <Info size={16} />
-        <p>Calculation based on U-100 Insulin Syringe.</p>
+        <div>
+          <strong>U-100 Insulin Syringe:</strong> Most common. 100 units = 1ml.
+          <br />
+          <strong>Tip:</strong> Add a little extra BAC water for easier dosing.
+        </div>
       </div>
     </div>
   );

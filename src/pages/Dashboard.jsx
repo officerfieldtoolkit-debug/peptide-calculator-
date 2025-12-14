@@ -2,37 +2,26 @@ import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Activity, Syringe, Calendar, ArrowRight, TrendingDown } from 'lucide-react';
 import { useInjections } from '../hooks/useInjections';
+import { useAuth } from '../context/AuthContext';
 import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
-    const { injections } = useInjections();
+    const { getStats } = useInjections();
+    const { user } = useAuth();
 
-    const stats = useMemo(() => {
-        if (injections.length === 0) return null;
+    const stats = useMemo(() => getStats(), [getStats]);
 
-        const lastInjection = injections[0]; // Assuming sorted by date desc (which they are in hook)
-
-        // Calculate total active mg (rough estimate using Semaglutide 7-day half-life as default)
-        const now = Date.now();
-        let totalActive = 0;
-        injections.forEach(inj => {
-            const injTime = new Date(inj.date).getTime();
-            const elapsedHours = (now - injTime) / (1000 * 60 * 60);
-            // Defaulting to 168h (7 days) for dashboard summary
-            const remaining = inj.dosage * Math.pow(0.5, elapsedHours / 168);
-            totalActive += remaining;
-        });
-
-        return {
-            lastShot: lastInjection,
-            activeLevel: totalActive.toFixed(2)
-        };
-    }, [injections]);
+    // Get user's first name for greeting
+    const userName = useMemo(() => {
+        if (!user) return 'Guest';
+        const fullName = user.user_metadata?.full_name || user.email || 'User';
+        return fullName.split(' ')[0].split('@')[0];
+    }, [user]);
 
     return (
         <div className="padding-container" style={{ padding: '20px' }}>
             <header className={styles.header}>
-                <h1>Hello, User</h1>
+                <h1>Hello, {userName}</h1>
                 <p className={styles.subtitle}>Here's your peptide summary</p>
             </header>
 
@@ -56,9 +45,9 @@ const Dashboard = () => {
                     <div className={styles.cardContent}>
                         <span className={styles.label}>Last Injection</span>
                         <span className={styles.value}>
-                            {stats ? new Date(stats.lastShot.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '--'}
+                            {stats ? new Date(stats.lastInjection.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '--'}
                         </span>
-                        {stats && <span className={styles.subtext}>{stats.lastShot.peptide}</span>}
+                        {stats && <span className={styles.subtext}>{stats.lastInjection.peptide}</span>}
                     </div>
                 </div>
             </div>

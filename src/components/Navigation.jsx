@@ -1,11 +1,38 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Syringe, Calculator, Activity, Calendar, TrendingDown, BookOpen, User, LogIn } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { LayoutDashboard, Syringe, Calculator, Activity, Calendar, TrendingDown, BookOpen, User, LogIn, MoreHorizontal, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import styles from './Navigation.module.css';
 
 const Navigation = () => {
   const { user } = useAuth();
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const location = useLocation();
+  const menuRef = useRef(null);
+
+  // Close menu when route changes
+  useEffect(() => {
+    setMoreMenuOpen(false);
+  }, [location.pathname]);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMoreMenuOpen(false);
+      }
+    };
+
+    if (moreMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [moreMenuOpen]);
 
   // Get user initials for the avatar
   const getUserInitials = () => {
@@ -20,115 +47,146 @@ const Navigation = () => {
     return name[0]?.toUpperCase() || 'U';
   };
 
+  // Check if any "more" menu item is active
+  const isMoreItemActive = ['/half-life', '/schedule', '/guides', '/price-checker'].includes(location.pathname);
+
+  // Secondary navigation items (shown in More menu on mobile)
+  const secondaryItems = [
+    { to: '/half-life', icon: Activity, label: 'Decay Plot', ariaLabel: 'Half-Life Plotter' },
+    { to: '/schedule', icon: Calendar, label: 'Schedule', ariaLabel: 'Schedule' },
+    { to: '/guides', icon: BookOpen, label: 'Guides', ariaLabel: 'Peptide Guides' },
+    { to: '/price-checker', icon: TrendingDown, label: 'Price Checker', ariaLabel: 'Price Checker' },
+  ];
+
   return (
-    <nav className={styles.nav}>
-      <div className={styles.navContent}>
-        <NavLink
-          to="/"
-          aria-label="Home"
-          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
-        >
-          <LayoutDashboard size={24} />
-          <span className={styles.label}>Home</span>
-        </NavLink>
+    <>
+      {/* Backdrop overlay */}
+      <div
+        className={`${styles.backdrop} ${moreMenuOpen ? styles.backdropVisible : ''}`}
+        onClick={() => setMoreMenuOpen(false)}
+      />
 
-        <NavLink
-          to="/tracker"
-          aria-label="Injection Tracker"
-          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
-        >
-          <Syringe size={24} />
-          <span className={styles.label}>Tracker</span>
-        </NavLink>
-
-        <NavLink
-          to="/calculator"
-          aria-label="Reconstitution Calculator"
-          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
-        >
-          <Calculator size={24} />
-          <span className={styles.label}>Reconst</span>
-        </NavLink>
-
-        <NavLink
-          to="/half-life"
-          aria-label="Half-Life Plotter"
-          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
-        >
-          <Activity size={24} />
-          <span className={styles.label}>Decay</span>
-        </NavLink>
-
-        <NavLink
-          to="/schedule"
-          aria-label="Schedule"
-          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
-        >
-          <Calendar size={24} />
-          <span className={styles.label}>Schedule</span>
-        </NavLink>
-
-        <NavLink
-          to="/encyclopedia"
-          aria-label="Peptide Encyclopedia"
-          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
-        >
-          <BookOpen size={24} />
-          <span className={styles.label}>Library</span>
-        </NavLink>
-
-        <NavLink
-          to="/guides"
-          aria-label="Peptide Guides"
-          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
-        >
-          <BookOpen size={24} />
-          <span className={styles.label}>Guides</span>
-        </NavLink>
-
-        <NavLink
-          to="/price-checker"
-          aria-label="Price Checker"
-          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
-        >
-          <TrendingDown size={24} />
-          <span className={styles.label}>Prices</span>
-        </NavLink>
-
-        {user ? (
-          <NavLink
-            to="/settings"
-            aria-label="Profile Settings"
-            className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
+      {/* More Menu Popup */}
+      <div
+        ref={menuRef}
+        className={`${styles.moreMenu} ${moreMenuOpen ? styles.moreMenuOpen : ''}`}
+      >
+        <div className={styles.moreMenuHeader}>
+          <span className={styles.moreMenuTitle}>More Options</span>
+          <button
+            className={styles.closeButton}
+            onClick={() => setMoreMenuOpen(false)}
+            aria-label="Close menu"
           >
-            <div style={{
-              width: '24px',
-              height: '24px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '11px',
-              fontWeight: 'bold',
-              color: 'white'
-            }}>
-              {getUserInitials()}
-            </div>
-            <span className={styles.label}>Profile</span>
-          </NavLink>
-        ) : (
-          <NavLink
-            to="/login"
-            aria-label="Login"
-            className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
-          >
-            <LogIn size={24} />
-            <span className={styles.label}>Login</span>
-          </NavLink>
-        )}
+            <X size={20} />
+          </button>
+        </div>
+        <div className={styles.moreMenuGrid}>
+          {secondaryItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              aria-label={item.ariaLabel}
+              className={({ isActive }) => `${styles.moreMenuItem} ${isActive ? styles.moreMenuItemActive : ''}`}
+              onClick={() => setMoreMenuOpen(false)}
+            >
+              <div className={styles.moreMenuIcon}>
+                <item.icon size={22} />
+              </div>
+              <span className={styles.moreMenuLabel}>{item.label}</span>
+            </NavLink>
+          ))}
+        </div>
       </div>
-    </nav>
+
+      {/* Main Navigation */}
+      <nav className={styles.nav}>
+        <div className={styles.navContent}>
+          <NavLink
+            to="/"
+            aria-label="Home"
+            className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
+          >
+            <LayoutDashboard size={22} />
+            <span className={styles.label}>Home</span>
+          </NavLink>
+
+          <NavLink
+            to="/tracker"
+            aria-label="Injection Tracker"
+            className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
+          >
+            <Syringe size={22} />
+            <span className={styles.label}>Tracker</span>
+          </NavLink>
+
+          <NavLink
+            to="/calculator"
+            aria-label="Reconstitution Calculator"
+            className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
+          >
+            <Calculator size={22} />
+            <span className={styles.label}>Calc</span>
+          </NavLink>
+
+          <NavLink
+            to="/encyclopedia"
+            aria-label="Peptide Encyclopedia"
+            className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
+          >
+            <BookOpen size={22} />
+            <span className={styles.label}>Library</span>
+          </NavLink>
+
+          {/* Desktop Only - Show secondary nav items directly */}
+          {secondaryItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              aria-label={item.ariaLabel}
+              className={({ isActive }) => `${styles.navItem} ${styles.desktopOnly} ${isActive ? styles.active : ''}`}
+            >
+              <item.icon size={22} />
+              <span className={styles.label}>{item.label}</span>
+            </NavLink>
+          ))}
+
+          {/* More Button - Mobile Only */}
+          <button
+            className={`${styles.navItem} ${styles.moreButton} ${styles.mobileOnly} ${isMoreItemActive ? styles.active : ''}`}
+            onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+            aria-label="More options"
+            aria-expanded={moreMenuOpen}
+          >
+            <MoreHorizontal size={22} />
+            <span className={styles.label}>More</span>
+            {isMoreItemActive && <span className={styles.activeDot} />}
+          </button>
+
+          {user ? (
+            <NavLink
+              to="/settings"
+              aria-label="Profile Settings"
+              className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
+            >
+              <div className={styles.avatarIcon}>
+                {getUserInitials()}
+              </div>
+              <span className={styles.label}>Profile</span>
+            </NavLink>
+          ) : (
+            <NavLink
+              to="/login"
+              aria-label="Login"
+              className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
+            >
+              <LogIn size={22} />
+              <span className={styles.label}>Login</span>
+            </NavLink>
+          )}
+        </div>
+      </nav>
+    </>
   );
 };
 
