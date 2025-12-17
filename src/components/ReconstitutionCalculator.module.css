@@ -313,6 +313,21 @@
   color: var(--accent-primary);
 }
 
+.recommendBtn {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15));
+  border-color: rgba(168, 85, 247, 0.4);
+  color: #c084fc;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.recommendBtn:hover {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(236, 72, 153, 0.25));
+  border-color: rgba(168, 85, 247, 0.6);
+  color: #d8b4fe;
+}
+
 /* Dose Input Row */
 .doseInputRow {
   display: flex;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Syringe, Info, ChevronDown, Bookmark, BookmarkCheck, Trash2, RotateCcw, Beaker, Droplets, FlaskConical } from 'lucide-react';
+import { Syringe, Info, ChevronDown, Bookmark, BookmarkCheck, Trash2, RotateCcw, Beaker, Droplets, FlaskConical, Sparkles } from 'lucide-react';
 import styles from './ReconstitutionCalculator.module.css';
 import SyringeVisualizer from './SyringeVisualizer';
 import { PEPTIDE_DATABASE } from '../data/peptideDatabase';
@@ -201,6 +201,56 @@ const ReconstitutionCalculator = () => {
     setSyringeType('u100');
   };
 
+  // Recommend optimal water amount for easy dosing
+  const recommendWater = () => {
+    if (numVialAmount <= 0 || numDoseAmount <= 0) return;
+
+    const syringe = SYRINGE_TYPES.find(s => s.id === syringeType);
+    const unitsPerMl = syringe?.unitsPerMl || 100;
+    const maxUnits = syringe?.maxUnits || 100;
+
+    // Convert dose to mcg
+    const doseMcg = doseUnit === 'mg' ? numDoseAmount * 1000 : numDoseAmount;
+    const totalMcg = numVialAmount * 1000;
+
+    // Target nice round unit values for easy measurement
+    // Prefer: 10, 20, 25, 50 units (easy to read on syringe)
+    const targetUnits = [10, 20, 25, 50, 5, 15, 30, 40];
+
+    let bestWater = null;
+    let bestUnits = null;
+
+    for (const targetUnit of targetUnits) {
+      // Skip if target exceeds syringe capacity
+      if (targetUnit > maxUnits) continue;
+
+      // Calculate water needed: water = (totalMcg * targetUnit) / (doseMcg * unitsPerMl)
+      const waterNeeded = (totalMcg * targetUnit) / (doseMcg * unitsPerMl);
+
+      // Check if water amount is reasonable (0.5ml - 3ml range)
+      if (waterNeeded >= 0.5 && waterNeeded <= 3) {
+        // Round to nearest 0.1ml for practicality
+        const roundedWater = Math.round(waterNeeded * 10) / 10;
+
+        // Verify this gives us close to our target units
+        const actualUnits = (doseMcg / (totalMcg / roundedWater)) * unitsPerMl;
+
+        if (actualUnits <= maxUnits) {
+          bestWater = roundedWater;
+          bestUnits = Math.round(actualUnits * 10) / 10;
+          break;
+        }
+      }
+    }
+
+    // Fallback: calculate for 2ml if no nice option found
+    if (!bestWater) {
+      bestWater = 2;
+    }
+
+    setWaterAmount(String(bestWater));
+  };
+
   return (
     <div className={styles.container}>
       {/* Header */}
@@ -359,6 +409,14 @@ const ReconstitutionCalculator = () => {
                 {w}ml
               </button>
             ))}
+            <button
+              className={`${styles.quickBtn} ${styles.recommendBtn}`}
+              onClick={recommendWater}
+              title="Calculate optimal water for easy-to-read syringe marks"
+            >
+              <Sparkles size={14} />
+              Recommend
+            </button>
           </div>
         </div>
 
