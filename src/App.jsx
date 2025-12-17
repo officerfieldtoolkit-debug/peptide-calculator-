@@ -19,6 +19,9 @@ import AdminLayout from './components/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminPeptides from './pages/admin/AdminPeptides';
 import CookieConsent from './components/CookieConsent';
+import SupportTickets from './components/SupportTickets';
+import AdminTickets from './components/AdminTickets';
+import AdminAuditLogs from './components/AdminAuditLogs';
 
 const Calculator = lazy(() => import('./pages/Calculator'));
 const HalfLife = lazy(() => import('./pages/HalfLife'));
@@ -109,6 +112,11 @@ function App() {
                   <Settings />
                 </ProtectedRoute>
               } />
+              <Route path="support" element={
+                <ProtectedRoute>
+                  <SupportTickets />
+                </ProtectedRoute>
+              } />
 
               {/* Admin Routes - Requires admin role */}
               <Route path="admin" element={
@@ -118,6 +126,8 @@ function App() {
               }>
                 <Route index element={<AdminDashboard />} />
                 <Route path="peptides" element={<AdminPeptides />} />
+                <Route path="tickets" element={<AdminTickets />} />
+                <Route path="audit-logs" element={<AdminAuditLogs />} />
               </Route>
               <Route path="terms" element={<Terms />} />
               <Route path="privacy" element={<Privacy />} />

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, Database, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Database, Settings, LogOut, MessageCircle, Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const AdminLayout = () => {
@@ -79,6 +79,40 @@ const AdminLayout = () => {
                     >
                         <Users size={20} />
                         Users
+                    </NavLink>
+                    <NavLink
+                        to="/admin/tickets"
+                        style={({ isActive }) => ({
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            padding: '0.75rem',
+                            borderRadius: '0.5rem',
+                            color: isActive ? 'white' : 'var(--text-secondary)',
+                            background: isActive ? 'var(--accent-primary)' : 'transparent',
+                            textDecoration: 'none',
+                            transition: 'all 0.2s'
+                        })}
+                    >
+                        <MessageCircle size={20} />
+                        Support Tickets
+                    </NavLink>
+                    <NavLink
+                        to="/admin/audit-logs"
+                        style={({ isActive }) => ({
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            padding: '0.75rem',
+                            borderRadius: '0.5rem',
+                            color: isActive ? 'white' : 'var(--text-secondary)',
+                            background: isActive ? 'var(--accent-primary)' : 'transparent',
+                            textDecoration: 'none',
+                            transition: 'all 0.2s'
+                        })}
+                    >
+                        <Activity size={20} />
+                        Audit Logs
                     </NavLink>
                 </nav>
 
