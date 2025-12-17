@@ -11,6 +11,7 @@ import { exportService } from '../services/exportService';
 import { getUserReviews, deleteReview } from '../services/reviewService';
 import { useInjections } from '../hooks/useInjections';
 import ShareProgress from '../components/ShareProgress';
+import DataManagement from '../components/DataManagement';
 import styles from './Settings.module.css';
 
 const Settings = () => {
@@ -135,7 +136,8 @@ const Settings = () => {
         { id: 'activity', label: 'Activity', icon: Activity },
         { id: 'security', label: 'Security', icon: Lock },
         { id: 'notifications', label: 'Notifications', icon: Bell },
-        { id: 'privacy', label: 'Privacy & Data', icon: Shield }
+        { id: 'data', label: 'Data & Backup', icon: Database },
+        { id: 'privacy', label: 'Privacy', icon: Shield }
     ];
 
     if (loading) {
@@ -603,6 +605,16 @@ const Settings = () => {
                             </div>
 
                             <button className="btn-primary" style={{ marginTop: '1.5rem' }}>Save Preferences</button>
+                        </div>
+                    )}
+
+                    {activeTab === 'data' && (
+                        <div className={styles.section}>
+                            <h2>Data & Backup</h2>
+                            <p className={styles.subtitle} style={{ marginBottom: '1.5rem' }}>
+                                Export, import, and manage your personal data
+                            </p>
+                            <DataManagement />
                         </div>
                     )}
 
