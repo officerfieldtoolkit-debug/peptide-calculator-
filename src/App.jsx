@@ -23,6 +23,7 @@ import SupportTickets from './components/SupportTickets';
 import AdminTickets from './components/AdminTickets';
 import AdminAuditLogs from './components/AdminAuditLogs';
 import AdminMonitoring from './components/AdminMonitoring';
+import AdminSecurityAudit from './components/AdminSecurityAudit';
 
 const Calculator = lazy(() => import('./pages/Calculator'));
 const HalfLife = lazy(() => import('./pages/HalfLife'));
@@ -130,6 +131,7 @@ function App() {
                 <Route path="tickets" element={<AdminTickets />} />
                 <Route path="audit-logs" element={<AdminAuditLogs />} />
                 <Route path="monitoring" element={<AdminMonitoring />} />
+                <Route path="security" element={<AdminSecurityAudit />} />
               </Route>
               <Route path="terms" element={<Terms />} />
               <Route path="privacy" element={<Privacy />} />

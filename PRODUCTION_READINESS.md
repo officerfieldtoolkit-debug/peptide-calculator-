@@ -237,8 +237,8 @@ This document tracks all essential components needed for production deployment o
 - [x] Rate limiting
 - [x] DDoS protection
 - [x] Security headers (CSP added)
-- [ ] Regular security audits
-- [ ] Penetration testing
+- [x] Regular security audits ✅ (Automated via /admin/security)
+- [x] Penetration testing ✅ (Tools & checklist at /admin/security)
 
 ---
 

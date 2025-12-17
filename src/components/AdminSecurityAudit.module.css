@@ -1,0 +1,443 @@
+.container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 1.75rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header p {
+    margin: 0.5rem 0 0 0;
+    color: var(--text-muted);
+}
+
+.runBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.runBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Score Card */
+.scoreCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-xl);
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.scoreMain {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.scoreMain h2 {
+    margin: 0;
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.scoreMain p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.scoreDetails {
+    display: flex;
+    gap: 2rem;
+}
+
+.scoreStat {
+    text-align: center;
+}
+
+.scoreValue {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.scoreLabel {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Checks Section */
+.checksSection {
+    margin-bottom: 2rem;
+}
+
+.checksSection h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+}
+
+.checksList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.checkCard {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.checkHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.checkHeader:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.checkInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.checkIndicator {
+    width: 6px;
+    height: 40px;
+    border-radius: 3px;
+}
+
+.checkInfo h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.checkInfo p {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+.checkScore {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.checkDetails {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.findings,
+.recommendations {
+    margin-bottom: 1rem;
+}
+
+.findings h5,
+.recommendations h5 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.findings ul,
+.recommendations ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.findings li,
+.recommendations li {
+    margin-bottom: 0.25rem;
+}
+
+.recommendations {
+    margin-bottom: 0;
+}
+
+.recommendations ul {
+    color: #f59e0b;
+}
+
+/* Recommendations Section */
+.recommendationsSection {
+    padding: 1.5rem;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: var(--radius-lg);
+    margin-bottom: 2rem;
+}
+
+.recommendationsSection h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1rem 0;
+    color: #f59e0b;
+}
+
+.recommendationsSection ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--text-secondary);
+}
+
+/* Pen Test Section */
+.penTestSection {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-xl);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.penTestHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.penTestHeader:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.penTestHeader h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.penTestHeader p {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.penTestContent {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.toolsSection,
+.checklistSection,
+.servicesSection {
+    margin-bottom: 2rem;
+}
+
+.toolsSection h4,
+.checklistSection h4,
+.servicesSection h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-secondary);
+}
+
+.toolsGrid,
+.servicesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.toolCard {
+    padding: 1rem;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.toolCard:hover {
+    background: rgba(59, 130, 246, 0.15);
+    transform: translateY(-2px);
+}
+
+.toolCard h5 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.5rem 0;
+    color: #60a5fa;
+}
+
+.toolCard p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+.toolUsage {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.checklistSection ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.checklistSection li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.checklistSection input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.checklistSection label {
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.serviceCard {
+    padding: 1rem;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: var(--radius-md);
+}
+
+.serviceCard h5 {
+    margin: 0 0 0.5rem 0;
+    color: #a78bfa;
+}
+
+.serviceCard p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+.serviceTier {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+/* Quick Actions */
+.quickActions {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+}
+
+.quickActions h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text-secondary);
+}
+
+.actionButtons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.actionBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: var(--radius-md);
+    color: #10b981;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.actionBtn:hover {
+    background: rgba(16, 185, 129, 0.2);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .scoreCard {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .scoreDetails {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
