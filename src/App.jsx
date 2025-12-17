@@ -1,12 +1,12 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
-import Tracker from './pages/Tracker';
+import Log from './pages/Log';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import ForgotPassword from './pages/ForgotPassword';
@@ -27,7 +27,6 @@ import AdminSecurityAudit from './components/AdminSecurityAudit';
 
 const Calculator = lazy(() => import('./pages/Calculator'));
 const HalfLife = lazy(() => import('./pages/HalfLife'));
-const Schedule = lazy(() => import('./pages/Schedule'));
 const PriceChecker = lazy(() => import('./pages/PriceChecker'));
 const Encyclopedia = lazy(() => import('./pages/Encyclopedia'));
 const PeptideDetail = lazy(() => import('./pages/PeptideDetail'));
@@ -36,7 +35,6 @@ const Safety = lazy(() => import('./pages/Safety'));
 const BeginnerGuide = lazy(() => import('./pages/guides/BeginnerGuide'));
 const InjectionGuide = lazy(() => import('./pages/guides/InjectionGuide'));
 const ForumPage = lazy(() => import('./pages/Forum'));
-
 
 import { initAnalytics } from './lib/analytics';
 
@@ -56,7 +54,10 @@ function App() {
               </ErrorBoundary>
             }>
               <Route index element={<Dashboard />} />
-              <Route path="tracker" element={<Tracker />} />
+              <Route path="log" element={<Log />} />
+              {/* Backwards compatibility redirects */}
+              <Route path="tracker" element={<Navigate to="/log" replace />} />
+              <Route path="schedule" element={<Navigate to="/log" replace />} />
               <Route path="calculator" element={
                 <Suspense fallback={<div style={{ padding: '20px' }}>Loading calculator...</div>}>
                   <Calculator />
@@ -70,11 +71,6 @@ function App() {
               <Route path="login" element={<Login />} />
               <Route path="signup" element={<SignUp />} />
               <Route path="forgot-password" element={<ForgotPassword />} />
-              <Route path="schedule" element={
-                <Suspense fallback={<div style={{ padding: '20px' }}>Loading schedule...</div>}>
-                  <Schedule />
-                </Suspense>
-              } />
               <Route path="price-checker" element={
                 <Suspense fallback={<div style={{ padding: '20px' }}>Loading price checker...</div>}>
                   <PriceChecker />

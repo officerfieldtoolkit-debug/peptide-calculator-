@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Syringe, Calculator, Activity, Calendar, TrendingDown, BookOpen, User, LogIn, MoreHorizontal, X, MessageCircle } from 'lucide-react';
+import { LayoutDashboard, Syringe, Calculator, Activity, TrendingDown, BookOpen, User, LogIn, MoreHorizontal, X, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import styles from './Navigation.module.css';
 
@@ -48,12 +48,11 @@ const Navigation = () => {
   };
 
   // Check if any "more" menu item is active
-  const isMoreItemActive = ['/half-life', '/schedule', '/guides', '/price-checker', '/forum'].includes(location.pathname);
+  const isMoreItemActive = ['/half-life', '/guides', '/price-checker', '/forum'].includes(location.pathname);
 
   // Secondary navigation items (shown in More menu on mobile)
   const secondaryItems = [
     { to: '/half-life', icon: Activity, label: 'Decay Plot', ariaLabel: 'Half-Life Plotter' },
-    { to: '/schedule', icon: Calendar, label: 'Schedule', ariaLabel: 'Schedule' },
     { to: '/guides', icon: BookOpen, label: 'Guides', ariaLabel: 'Peptide Guides' },
     { to: '/price-checker', icon: TrendingDown, label: 'Prices', ariaLabel: 'Price Checker' },
     { to: '/forum', icon: MessageCircle, label: 'Forum', ariaLabel: 'Community Forum' },
@@ -113,12 +112,12 @@ const Navigation = () => {
           </NavLink>
 
           <NavLink
-            to="/tracker"
-            aria-label="Injection Tracker"
+            to="/log"
+            aria-label="Injection Log"
             className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
           >
             <Syringe size={22} />
-            <span className={styles.label}>Tracker</span>
+            <span className={styles.label}>Log</span>
           </NavLink>
 
           <NavLink
