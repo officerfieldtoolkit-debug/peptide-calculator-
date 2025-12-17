@@ -211,6 +211,8 @@ const InjectionLog = () => {
         resetForm();
         setFormMode('recurring');
         setShowForm(true);
+        // Switch to calendar view so the form is visible
+        setActiveView('calendar');
     };
 
     const toggleRecurrenceDay = (dayValue) => {
@@ -266,11 +268,15 @@ const InjectionLog = () => {
             });
         } else if (formMode === 'recurring') {
             // Create recurring schedule
-            if (formData.recurrenceDays.length === 0) return;
+            if (formData.recurrenceDays.length === 0) {
+                return;
+            }
 
             const startDate = new Date();
+            startDate.setHours(0, 0, 0, 0);
             const endDate = new Date();
             endDate.setDate(endDate.getDate() + formData.duration);
+            endDate.setHours(23, 59, 59, 999);
 
             await createRecurringSchedule({
                 peptide: formData.peptide,
