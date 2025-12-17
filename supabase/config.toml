@@ -1,8 +1,6 @@
 # Supabase Configuration
 # This file configures local development environment
-
-[project]
-id = "nhiwjerqyhtpienorzky"
+# Project ID: nhiwjerqyhtpienorzky (link via: supabase link --project-ref nhiwjerqyhtpienorzky)
 
 [api]
 enabled = true
@@ -27,16 +25,16 @@ enable_confirmations = true
 
 [auth.email.template.confirmation]
 subject = "Welcome to Peptide Tracker - Confirm your email"
-content_path = "./templates/confirmation.html"
+content_path = "supabase/templates/confirmation.html"
 
 [auth.email.template.recovery]
 subject = "Reset your Peptide Tracker password"
-content_path = "./templates/recovery.html"
+content_path = "supabase/templates/recovery.html"
 
 [auth.email.template.magic_link]
 subject = "Your Peptide Tracker login link"
-content_path = "./templates/magic_link.html"
+content_path = "supabase/templates/magic_link.html"
 
 [auth.email.template.email_change]
 subject = "Confirm your new email - Peptide Tracker"
-content_path = "./templates/confirmation.html"
+content_path = "supabase/templates/confirmation.html"
