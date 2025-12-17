@@ -36,13 +36,13 @@ const PeptideDetail = () => {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', marginBottom: '0.25rem', fontSize: '0.875rem' }}>
                                     <Clock size={16} /> Half-Life
                                 </div>
-                                <div style={{ fontWeight: '600', color: 'white' }}>{peptide.halfLife}</div>
+                                <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{peptide.halfLife}</div>
                             </div>
                             <div style={{ padding: '1rem', background: 'rgba(15, 23, 42, 0.5)', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', marginBottom: '0.25rem', fontSize: '0.875rem' }}>
                                     <Activity size={16} /> Common Dosage
                                 </div>
-                                <div style={{ fontWeight: '600', color: 'white' }}>{peptide.commonDosage}</div>
+                                <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{peptide.commonDosage}</div>
                             </div>
                         </div>
                     </div>

@@ -1,7 +1,9 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Tracker from './pages/Tracker';
@@ -40,89 +42,91 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={
-            <ErrorBoundary>
-              <Layout />
-            </ErrorBoundary>
-          }>
-            <Route index element={<Dashboard />} />
-            <Route path="tracker" element={<Tracker />} />
-            <Route path="calculator" element={
-              <Suspense fallback={<div style={{ padding: '20px' }}>Loading calculator...</div>}>
-                <Calculator />
-              </Suspense>
-            } />
-            <Route path="half-life" element={
-              <Suspense fallback={<div style={{ padding: '20px' }}>Loading half-life tools...</div>}>
-                <HalfLife />
-              </Suspense>
-            } />
-            <Route path="login" element={<Login />} />
-            <Route path="signup" element={<SignUp />} />
-            <Route path="forgot-password" element={<ForgotPassword />} />
-            <Route path="schedule" element={
-              <Suspense fallback={<div style={{ padding: '20px' }}>Loading schedule...</div>}>
-                <Schedule />
-              </Suspense>
-            } />
-            <Route path="price-checker" element={
-              <Suspense fallback={<div style={{ padding: '20px' }}>Loading price checker...</div>}>
-                <PriceChecker />
-              </Suspense>
-            } />
-            <Route path="encyclopedia" element={
-              <Suspense fallback={<div style={{ padding: '20px' }}>Loading encyclopedia...</div>}>
-                <Encyclopedia />
-              </Suspense>
-            } />
-            <Route path="encyclopedia/:name" element={
-              <Suspense fallback={<div style={{ padding: '20px' }}>Loading...</div>}>
-                <PeptideDetail />
-              </Suspense>
-            } />
-            <Route path="guides" element={
-              <Suspense fallback={<div style={{ padding: '20px' }}>Loading guides...</div>}>
-                <Guides />
-              </Suspense>
-            } />
-            <Route path="guides/beginner" element={
-              <Suspense fallback={<div style={{ padding: '20px' }}>Loading guide...</div>}>
-                <BeginnerGuide />
-              </Suspense>
-            } />
-            <Route path="guides/injection" element={
-              <Suspense fallback={<div style={{ padding: '20px' }}>Loading guide...</div>}>
-                <InjectionGuide />
-              </Suspense>
-            } />
-            <Route path="safety" element={
-              <Suspense fallback={<div style={{ padding: '20px' }}>Loading safety info...</div>}>
-                <Safety />
-              </Suspense>
-            } />
-            <Route path="settings" element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            } />
-
-            {/* Admin Routes */}
-            <Route path="admin" element={
-              <ProtectedRoute>
-                <AdminLayout />
-              </ProtectedRoute>
+        <ThemeProvider>
+          <Routes>
+            <Route path="/" element={
+              <ErrorBoundary>
+                <Layout />
+              </ErrorBoundary>
             }>
-              <Route index element={<AdminDashboard />} />
-              <Route path="peptides" element={<AdminPeptides />} />
+              <Route index element={<Dashboard />} />
+              <Route path="tracker" element={<Tracker />} />
+              <Route path="calculator" element={
+                <Suspense fallback={<div style={{ padding: '20px' }}>Loading calculator...</div>}>
+                  <Calculator />
+                </Suspense>
+              } />
+              <Route path="half-life" element={
+                <Suspense fallback={<div style={{ padding: '20px' }}>Loading half-life tools...</div>}>
+                  <HalfLife />
+                </Suspense>
+              } />
+              <Route path="login" element={<Login />} />
+              <Route path="signup" element={<SignUp />} />
+              <Route path="forgot-password" element={<ForgotPassword />} />
+              <Route path="schedule" element={
+                <Suspense fallback={<div style={{ padding: '20px' }}>Loading schedule...</div>}>
+                  <Schedule />
+                </Suspense>
+              } />
+              <Route path="price-checker" element={
+                <Suspense fallback={<div style={{ padding: '20px' }}>Loading price checker...</div>}>
+                  <PriceChecker />
+                </Suspense>
+              } />
+              <Route path="encyclopedia" element={
+                <Suspense fallback={<div style={{ padding: '20px' }}>Loading encyclopedia...</div>}>
+                  <Encyclopedia />
+                </Suspense>
+              } />
+              <Route path="encyclopedia/:name" element={
+                <Suspense fallback={<div style={{ padding: '20px' }}>Loading...</div>}>
+                  <PeptideDetail />
+                </Suspense>
+              } />
+              <Route path="guides" element={
+                <Suspense fallback={<div style={{ padding: '20px' }}>Loading guides...</div>}>
+                  <Guides />
+                </Suspense>
+              } />
+              <Route path="guides/beginner" element={
+                <Suspense fallback={<div style={{ padding: '20px' }}>Loading guide...</div>}>
+                  <BeginnerGuide />
+                </Suspense>
+              } />
+              <Route path="guides/injection" element={
+                <Suspense fallback={<div style={{ padding: '20px' }}>Loading guide...</div>}>
+                  <InjectionGuide />
+                </Suspense>
+              } />
+              <Route path="safety" element={
+                <Suspense fallback={<div style={{ padding: '20px' }}>Loading safety info...</div>}>
+                  <Safety />
+                </Suspense>
+              } />
+              <Route path="settings" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+
+              {/* Admin Routes - Requires admin role */}
+              <Route path="admin" element={
+                <AdminRoute>
+                  <AdminLayout />
+                </AdminRoute>
+              }>
+                <Route index element={<AdminDashboard />} />
+                <Route path="peptides" element={<AdminPeptides />} />
+              </Route>
+              <Route path="terms" element={<Terms />} />
+              <Route path="privacy" element={<Privacy />} />
+              <Route path="*" element={<NotFound />} />
             </Route>
-            <Route path="terms" element={<Terms />} />
-            <Route path="privacy" element={<Privacy />} />
             <Route path="*" element={<NotFound />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <CookieConsent />
+          </Routes>
+          <CookieConsent />
+        </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>
   );

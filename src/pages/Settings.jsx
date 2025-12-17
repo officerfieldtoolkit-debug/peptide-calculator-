@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { User, Shield, Bell, Database, Save, LogOut, AlertTriangle, Loader, Lock, Mail, Download, Trash2, Star, MessageSquare, ExternalLink, Activity } from 'lucide-react';
+import { User, Shield, Bell, Database, Save, LogOut, AlertTriangle, Loader, Lock, Mail, Download, Trash2, Star, MessageSquare, ExternalLink, Activity, Sun, Moon, Globe, Share2, FileText } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { notificationService } from '../services/notificationService';
 import { emailService } from '../services/emailService';
+import { exportService } from '../services/exportService';
 import { getUserReviews, deleteReview } from '../services/reviewService';
+import { useInjections } from '../hooks/useInjections';
+import ShareProgress from '../components/ShareProgress';
 import styles from './Settings.module.css';
 
 const Settings = () => {
     const { user, signOut } = useAuth();
+    const { theme, toggleTheme, setThemeMode } = useTheme();
+    const { t, i18n } = useTranslation();
+    const { injections } = useInjections();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState(null);
@@ -23,7 +31,9 @@ const Settings = () => {
         weight_goal: 'weight-loss'
     });
 
-    const [darkMode, setDarkMode] = useState(false);
+    const [darkMode, setDarkMode] = useState(theme === 'dark');
+    const [showShareModal, setShowShareModal] = useState(false);
+    const [exportLoading, setExportLoading] = useState(false);
     const [notifications, setNotifications] = useState({
         injectionReminders: true,
         expirationAlerts: true,
@@ -527,20 +537,57 @@ const Settings = () => {
                             <h3>Appearance</h3>
                             <div className={styles.toggleItem}>
                                 <div>
-                                    <h3>Dark Mode</h3>
-                                    <p>Use dark theme across the app</p>
+                                    <h3>{theme === 'dark' ? <Moon size={18} /> : <Sun size={18} />} Theme</h3>
+                                    <p>Switch between dark and light mode</p>
                                 </div>
                                 <label className={styles.toggle}>
                                     <input
                                         type="checkbox"
-                                        checked={darkMode}
-                                        onChange={(e) => setDarkMode(e.target.checked)}
+                                        checked={theme === 'dark'}
+                                        onChange={() => toggleTheme()}
                                     />
-                                    <span className={styles.toggleSlider}></span>
+                                    <span className={styles.slider}></span>
                                 </label>
                             </div>
 
-                            <div style={{ marginLeft: '3rem', marginBottom: '1.5rem' }}>
+                            <div className={styles.toggleItem}>
+                                <div>
+                                    <h3><Globe size={18} /> Language</h3>
+                                    <p>Select your preferred language</p>
+                                </div>
+                                <select
+                                    value={i18n.language}
+                                    onChange={(e) => {
+                                        i18n.changeLanguage(e.target.value);
+                                        localStorage.setItem('peptide_language', e.target.value);
+                                    }}
+                                    style={{
+                                        background: 'var(--glass-bg)',
+                                        border: '1px solid var(--glass-border)',
+                                        borderRadius: '8px',
+                                        padding: '8px 12px',
+                                        color: 'var(--text-primary)',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    <option value="en">English</option>
+                                    <option value="es">Español</option>
+                                </select>
+                            </div>
+
+                            <div className={styles.divider}></div>
+
+                            <h3><Share2 size={18} /> Share Progress</h3>
+                            <p className={styles.description}>Generate a shareable image of your progress stats</p>
+                            <button
+                                className={styles.secondaryBtn}
+                                onClick={() => setShowShareModal(true)}
+                            >
+                                <Share2 size={18} />
+                                Create Share Image
+                            </button>
+
+                            <div style={{ marginTop: '1.5rem' }}>
                                 <button
                                     className={styles.secondaryBtn}
                                     style={{ fontSize: '0.8rem', padding: '0.5rem 1rem' }}
@@ -555,7 +602,7 @@ const Settings = () => {
                                 </button>
                             </div>
 
-                            <button className="btn-primary">Save Preferences</button>
+                            <button className="btn-primary" style={{ marginTop: '1.5rem' }}>Save Preferences</button>
                         </div>
                     )}
 
@@ -574,15 +621,53 @@ const Settings = () => {
 
                             <div className={styles.divider}></div>
 
-                            <h3>Export Your Data</h3>
+                            <h3><Download size={18} /> Export Your Data</h3>
                             <p className={styles.description}>
-                                Download a copy of all your data in JSON format. This includes injection logs,
-                                schedules, and all personal information.
+                                Download your injection history and data. Choose your preferred format.
                             </p>
-                            <button className={styles.secondaryBtn}>
-                                <Download size={18} />
-                                Export Data
-                            </button>
+                            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                                <button
+                                    className={styles.secondaryBtn}
+                                    disabled={exportLoading || injections.length === 0}
+                                    onClick={async () => {
+                                        setExportLoading(true);
+                                        try {
+                                            exportService.toCSV(injections);
+                                            setMessage({ type: 'success', text: 'CSV exported successfully!' });
+                                        } catch (error) {
+                                            setMessage({ type: 'error', text: error.message });
+                                        } finally {
+                                            setExportLoading(false);
+                                        }
+                                    }}
+                                >
+                                    <FileText size={18} />
+                                    Export as CSV
+                                </button>
+                                <button
+                                    className={styles.secondaryBtn}
+                                    disabled={exportLoading || injections.length === 0}
+                                    onClick={async () => {
+                                        setExportLoading(true);
+                                        try {
+                                            exportService.toPDF(injections, { title: 'Injection History Report' });
+                                            setMessage({ type: 'success', text: 'PDF exported successfully!' });
+                                        } catch (error) {
+                                            setMessage({ type: 'error', text: error.message });
+                                        } finally {
+                                            setExportLoading(false);
+                                        }
+                                    }}
+                                >
+                                    <Download size={18} />
+                                    Export as PDF
+                                </button>
+                            </div>
+                            {injections.length === 0 && (
+                                <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '8px' }}>
+                                    No injection data to export yet.
+                                </p>
+                            )}
 
                             <div className={styles.divider}></div>
 
@@ -636,6 +721,10 @@ const Settings = () => {
                 </div>
             </div>
 
+            {/* Share Progress Modal */}
+            {showShareModal && (
+                <ShareProgress onClose={() => setShowShareModal(false)} />
+            )}
         </div>
     );
 };

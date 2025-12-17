@@ -55,7 +55,7 @@ const Encyclopedia = () => {
                                 background: 'rgba(15, 23, 42, 0.5)',
                                 border: '1px solid var(--glass-border)',
                                 borderRadius: 'var(--radius-md)',
-                                color: 'white',
+                                color: 'var(--text-primary)',
                                 fontSize: '1rem'
                             }}
                         />
@@ -72,7 +72,7 @@ const Encyclopedia = () => {
                                     background: 'rgba(15, 23, 42, 0.5)',
                                     border: '1px solid var(--glass-border)',
                                     borderRadius: 'var(--radius-md)',
-                                    color: 'white',
+                                    color: 'var(--text-primary)',
                                     fontSize: '1rem',
                                     appearance: 'none',
                                     cursor: 'pointer'
@@ -120,7 +120,7 @@ const Encyclopedia = () => {
                                 </span>
                             </div>
 
-                            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'white' }}>{peptide.name}</h3>
+                            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{peptide.name}</h3>
                             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: '1.5', marginBottom: '1.5rem', flex: 1 }}>
                                 {peptide.description.length > 100 ? peptide.description.substring(0, 100) + '...' : peptide.description}
                             </p>

@@ -18,7 +18,7 @@ const GuideCard = ({ title, description, icon: Icon, link, color }) => (
             }}>
                 <Icon size={24} />
             </div>
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: 'white' }}>{title}</h3>
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>{title}</h3>
             <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '1.5rem', flex: 1 }}>
                 {description}
             </p>
@@ -59,7 +59,7 @@ const Guides = () => {
                     description="Step-by-step visual guide for subcutaneous and intramuscular injections."
                     icon={Activity}
                     link="/guides/injection"
-                    color="#f59e0b"
+                    color="#8b5cf6"
                 />
             </div>
 
@@ -67,25 +67,25 @@ const Guides = () => {
                 <h2 style={{ fontSize: '2rem', marginBottom: '2rem', textAlign: 'center' }}>Frequently Asked Questions</h2>
                 <div className="card glass-panel" style={{ padding: '2rem' }}>
                     <div style={{ marginBottom: '2rem' }}>
-                        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'white' }}>How do I mix my peptides?</h3>
+                        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>How do I mix my peptides?</h3>
                         <p style={{ color: 'var(--text-secondary)' }}>
                             Check out our <Link to="/guides/beginner" style={{ color: 'var(--accent-primary)' }}>Beginner's Guide</Link> for a step-by-step walkthrough on reconstitution.
                         </p>
                     </div>
                     <div style={{ marginBottom: '2rem' }}>
-                        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'white' }}>Where should I store them?</h3>
+                        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>Where should I store them?</h3>
                         <p style={{ color: 'var(--text-secondary)' }}>
                             Powder vials can be stored in the freezer. Once mixed with water, they <strong>must</strong> be kept in the refrigerator. See our <Link to="/safety" style={{ color: 'var(--accent-primary)' }}>Safety Guide</Link>.
                         </p>
                     </div>
                     <div style={{ marginBottom: '2rem' }}>
-                        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'white' }}>How long do they last?</h3>
+                        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>How long do they last?</h3>
                         <p style={{ color: 'var(--text-secondary)' }}>
                             Most reconstituted peptides are stable for 30-60 days in the fridge. Unmixed powder can last for years in the freezer.
                         </p>
                     </div>
                     <div>
-                        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'white' }}>Are these legal?</h3>
+                        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>Are these legal?</h3>
                         <p style={{ color: 'var(--text-secondary)' }}>
                             Peptides are for research purposes only. Laws vary by country. Always consult with a qualified healthcare professional.
                         </p>

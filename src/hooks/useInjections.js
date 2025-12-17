@@ -49,7 +49,7 @@ export const useInjections = () => {
                 date: item.injection_date,
                 notes: item.notes || '',
                 site: item.injection_site || 'Abdomen',
-                bodyWeightKg: item.body_weight_kg || null
+                bodyWeightLbs: item.body_weight_lbs || null
             }));
 
             setInjections(formattedData);
@@ -107,7 +107,7 @@ export const useInjections = () => {
                         dosage_unit: injection.unit,
                         injection_date: newInjection.date,
                         injection_site: injection.site,
-                        body_weight_kg: injection.bodyWeightKg || null,
+                        body_weight_lbs: injection.bodyWeightLbs || null,
                         notes: injection.notes || ''
                     }])
                     .select()
@@ -156,7 +156,7 @@ export const useInjections = () => {
                         dosage_unit: updates.unit,
                         injection_date: updates.date,
                         injection_site: updates.site,
-                        body_weight_kg: updates.bodyWeightKg,
+                        body_weight_lbs: updates.bodyWeightLbs,
                         notes: updates.notes
                     })
                     .eq('id', id);

@@ -100,7 +100,7 @@ const HalfLifePlotter = () => {
     const [selectedPeptide, setSelectedPeptide] = useState('Semaglutide');
     const [customHalfLife, setCustomHalfLife] = useState(24);
     const [daysToProject, setDaysToProject] = useState(30);
-    const [weightKg, setWeightKg] = useState('');
+    const [weightLbs, setWeightLbs] = useState('');
     const [doseUnit, setDoseUnit] = useState('mg');
 
     const halfLifeHours = selectedPeptide === 'Custom' ? customHalfLife : PEPTIDE_PRESETS[selectedPeptide];
@@ -247,13 +247,13 @@ const HalfLifePlotter = () => {
                 </div>
 
                 <div className={styles.controlGroup}>
-                    <label>Body Weight (kg)</label>
+                    <label>Body Weight (lbs)</label>
                     <input
                         type="number"
                         step="0.1"
-                        placeholder="80"
-                        value={weightKg}
-                        onChange={(e) => setWeightKg(e.target.value)}
+                        placeholder="175"
+                        value={weightLbs}
+                        onChange={(e) => setWeightLbs(e.target.value)}
                         onWheel={(e) => e.target.blur()}
                     />
                 </div>
@@ -266,7 +266,7 @@ const HalfLifePlotter = () => {
                     <div className={styles.summary}>
                         <span>Entries: {injections.length}</span>
                         <span>Unit: {doseUnit}</span>
-                        {weightKg && <span>Weight: {weightKg} kg</span>}
+                        {weightLbs && <span>Weight: {weightLbs} lbs</span>}
                     </div>
                 </div>
 

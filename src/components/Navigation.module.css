@@ -43,7 +43,13 @@
     }
 
     .mobileOnly {
-        display: none;
+        display: none !important;
+    }
+
+    /* Hide the more menu and backdrop on desktop */
+    .moreMenu,
+    .backdrop {
+        display: none !important;
     }
 }
 

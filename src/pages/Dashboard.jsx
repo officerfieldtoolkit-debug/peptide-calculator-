@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Activity, Syringe, Calendar, ArrowRight, TrendingDown } from 'lucide-react';
 import { useInjections } from '../hooks/useInjections';
 import { useAuth } from '../context/AuthContext';
+import ProgressAnalytics from '../components/ProgressAnalytics';
 import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
@@ -88,6 +89,11 @@ const Dashboard = () => {
                         <ArrowRight size={20} className={styles.arrow} />
                     </Link>
                 </div>
+            </div>
+
+            {/* Progress Analytics Section */}
+            <div className={styles.section}>
+                <ProgressAnalytics />
             </div>
         </div>
     );

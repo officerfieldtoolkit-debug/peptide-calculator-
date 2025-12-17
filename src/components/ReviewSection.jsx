@@ -57,7 +57,7 @@ const ReviewSection = ({ peptideName }) => {
 
                 {reviews.length > 0 && (
                     <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'white', lineHeight: 1 }}>
+                        <div style={{ fontSize: '2.5rem', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1 }}>
                             {averageRating}
                         </div>
                         <div style={{ display: 'flex', gap: '2px', justifyContent: 'flex-end', margin: '0.25rem 0' }}>
@@ -124,7 +124,7 @@ const ReviewSection = ({ peptideName }) => {
                             background: 'rgba(15, 23, 42, 0.5)',
                             border: '1px solid var(--glass-border)',
                             borderRadius: '8px',
-                            color: 'white',
+                            color: 'var(--text-primary)',
                             marginBottom: '1rem',
                             resize: 'vertical'
                         }}
