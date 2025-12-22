@@ -158,17 +158,21 @@ export const useSchedule = () => {
         const days = eachDayOfInterval({ start: startDate, end: endDate });
         const schedulesToAdd = days
             .filter(day => recurrenceDays.includes(getDay(day)))
-            .map(day => ({
-                id: 'temp-' + Date.now() + '-' + day.getTime(),
-                date: day.toISOString(),
-                peptide,
-                dosage,
-                unit,
-                time,
-                completed: false,
-                notes,
-                isRecurring: true
-            }));
+            .map(day => {
+                // Create date at local noon to avoid timezone issues
+                const localDate = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 12, 0, 0);
+                return {
+                    id: 'temp-' + Date.now() + '-' + day.getTime(),
+                    date: localDate.toISOString(),
+                    peptide,
+                    dosage,
+                    unit,
+                    time,
+                    completed: false,
+                    notes,
+                    isRecurring: true
+                };
+            });
 
         // Optimistic update
         setSchedules(prev => [...prev, ...schedulesToAdd]);
@@ -301,18 +305,22 @@ export const useSchedule = () => {
         const days = eachDayOfInterval({ start: startDate, end: endDate });
         const schedulesToAdd = days
             .filter(day => template.recurrenceDays.includes(getDay(day)))
-            .map(day => ({
-                id: 'temp-' + Date.now() + '-' + day.getTime(),
-                date: day.toISOString(),
-                peptide: template.peptide,
-                dosage: template.dosage,
-                unit: template.unit,
-                time: template.time,
-                completed: false,
-                notes: template.notes,
-                isRecurring: true,
-                parentTemplateId: templateId
-            }));
+            .map(day => {
+                // Create date at local noon to avoid timezone issues
+                const localDate = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 12, 0, 0);
+                return {
+                    id: 'temp-' + Date.now() + '-' + day.getTime(),
+                    date: localDate.toISOString(),
+                    peptide: template.peptide,
+                    dosage: template.dosage,
+                    unit: template.unit,
+                    time: template.time,
+                    completed: false,
+                    notes: template.notes,
+                    isRecurring: true,
+                    parentTemplateId: templateId
+                };
+            });
 
         setSchedules(prev => [...prev, ...schedulesToAdd]);
 

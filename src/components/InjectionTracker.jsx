@@ -241,7 +241,7 @@ const InjectionTracker = () => {
                         <div className={styles.autocompleteWrapper}>
                             <input
                                 type="text"
-                                placeholder="Search peptides..."
+                                placeholder="Type or search peptide..."
                                 value={formData.peptide}
                                 onChange={e => setFormData({ ...formData, peptide: e.target.value })}
                                 onFocus={() => setShowAutocomplete(true)}

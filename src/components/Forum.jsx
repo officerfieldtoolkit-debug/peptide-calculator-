@@ -54,21 +54,13 @@ const Forum = () => {
             ]);
             setCategories(categoriesData || []);
             setRecentTopics(recentData || []);
-            setStats(statsData);
+            setStats(statsData || { topics: 0, posts: 0 });
         } catch (error) {
             console.error('Error loading forum data:', error);
-            // Set mock data for development
-            setCategories([
-                { id: '1', name: 'General Discussion', slug: 'general', description: 'General peptide discussions', icon: 'MessageCircle', color: '#6366f1' },
-                { id: '2', name: 'Peptide Protocols', slug: 'protocols', description: 'Dosing protocols and timing', icon: 'Beaker', color: '#10b981' },
-                { id: '3', name: 'Results & Progress', slug: 'results', description: 'Share your progress and results', icon: 'TrendingUp', color: '#f59e0b' },
-                { id: '4', name: 'Side Effects & Safety', slug: 'safety', description: 'Safety concerns and harm reduction', icon: 'Shield', color: '#ef4444' },
-                { id: '5', name: 'Sourcing & Vendors', slug: 'sourcing', description: 'Vendor reviews and sourcing', icon: 'ShoppingBag', color: '#8b5cf6' },
-                { id: '6', name: 'Research & Science', slug: 'research', description: 'Scientific studies and research', icon: 'BookOpen', color: '#06b6d4' },
-                { id: '7', name: 'Beginners Corner', slug: 'beginners', description: 'New to peptides? Start here', icon: 'HelpCircle', color: '#ec4899' },
-                { id: '8', name: 'Off-Topic', slug: 'off-topic', description: 'Non-peptide discussions', icon: 'Coffee', color: '#64748b' }
-            ]);
-            setStats({ topics: 156, posts: 1247 });
+            // Set empty data - no mock data
+            setCategories([]);
+            setRecentTopics([]);
+            setStats({ topics: 0, posts: 0 });
         } finally {
             setLoading(false);
         }
@@ -83,31 +75,10 @@ const Forum = () => {
             setView('category');
         } catch (error) {
             console.error('Error loading category:', error);
-            // Mock data
+            // Find category from local state
             const cat = categories.find(c => c.slug === slug);
             setSelectedCategory(cat);
-            setTopics([
-                {
-                    id: '1',
-                    title: 'Best time to take BPC-157?',
-                    content: 'What\'s the optimal timing for BPC-157 injections?',
-                    author: { full_name: 'PeptideUser123' },
-                    view_count: 234,
-                    posts: [{ count: 12 }],
-                    is_pinned: false,
-                    created_at: new Date(Date.now() - 3600000).toISOString()
-                },
-                {
-                    id: '2',
-                    title: 'Semaglutide dosing protocol for weight loss',
-                    content: 'Looking for advice on starting semaglutide...',
-                    author: { full_name: 'NewbieLifter' },
-                    view_count: 567,
-                    posts: [{ count: 28 }],
-                    is_pinned: true,
-                    created_at: new Date(Date.now() - 86400000).toISOString()
-                }
-            ]);
+            setTopics([]);
             setView('category');
         } finally {
             setLoading(false);
@@ -126,27 +97,16 @@ const Forum = () => {
             setView('topic');
         } catch (error) {
             console.error('Error loading topic:', error);
-            // Mock data
-            const topic = topics.find(t => t.id === topicId) || {
-                id: topicId,
-                title: 'Sample Topic',
-                content: 'This is a sample topic content for development...',
-                author: { full_name: 'TestUser', id: '123' },
-                category: { name: 'General', slug: 'general' },
-                view_count: 100,
-                created_at: new Date().toISOString()
-            };
-            setSelectedTopic(topic);
-            setPosts([
-                {
-                    id: '1',
-                    content: 'Great question! I\'ve been using it for 3 months now...',
-                    author: { full_name: 'ExperiencedUser', id: '456' },
-                    is_solution: false,
-                    created_at: new Date(Date.now() - 7200000).toISOString()
-                }
-            ]);
-            setView('topic');
+            // Find topic from local state if available
+            const topic = topics.find(t => t.id === topicId);
+            if (topic) {
+                setSelectedTopic(topic);
+                setPosts([]);
+                setView('topic');
+            } else {
+                // Go back to categories if topic not found
+                setView('categories');
+            }
         } finally {
             setLoading(false);
         }
@@ -271,31 +231,39 @@ const Forum = () => {
             </div>
 
             <div className={styles.categoriesGrid}>
-                {categories.map((category) => {
-                    const Icon = getIcon(category.icon);
-                    return (
-                        <div
-                            key={category.id}
-                            className={styles.categoryCard}
-                            onClick={() => loadCategory(category.slug)}
-                        >
-                            <div className={styles.categoryHeader}>
-                                <div
-                                    className={styles.categoryIcon}
-                                    style={{ background: `${category.color}20`, color: category.color }}
-                                >
-                                    <Icon size={22} />
+                {categories.length > 0 ? (
+                    categories.map((category) => {
+                        const Icon = getIcon(category.icon);
+                        return (
+                            <div
+                                key={category.id}
+                                className={styles.categoryCard}
+                                onClick={() => loadCategory(category.slug)}
+                            >
+                                <div className={styles.categoryHeader}>
+                                    <div
+                                        className={styles.categoryIcon}
+                                        style={{ background: `${category.color}20`, color: category.color }}
+                                    >
+                                        <Icon size={22} />
+                                    </div>
+                                    <span className={styles.categoryName}>{category.name}</span>
                                 </div>
-                                <span className={styles.categoryName}>{category.name}</span>
+                                <p className={styles.categoryDesc}>{category.description}</p>
+                                <div className={styles.categoryStats}>
+                                    <span>Topics: --</span>
+                                    <span>Posts: --</span>
+                                </div>
                             </div>
-                            <p className={styles.categoryDesc}>{category.description}</p>
-                            <div className={styles.categoryStats}>
-                                <span>Topics: --</span>
-                                <span>Posts: --</span>
-                            </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })
+                ) : (
+                    <div className={styles.emptyState} style={{ gridColumn: '1 / -1' }}>
+                        <MessageCircle size={48} />
+                        <h3>Forum Coming Soon</h3>
+                        <p>The community forum is being set up. Check back soon to join the discussion!</p>
+                    </div>
+                )}
             </div>
 
             {recentTopics.length > 0 && (

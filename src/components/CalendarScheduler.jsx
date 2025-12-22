@@ -129,12 +129,12 @@ const CalendarScheduler = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.peptide || !formData.dosage) return;
+        if (!formData.peptide.trim() || !formData.dosage) return;
 
         if (formMode === 'single') {
             addSchedule({
                 date: selectedDate.toISOString(),
-                peptide: formData.peptide,
+                peptide: formData.peptide.trim(),
                 dosage: parseFloat(formData.dosage),
                 unit: formData.unit,
                 time: formData.time,
@@ -150,15 +150,20 @@ const CalendarScheduler = () => {
             const startDate = new Date();
             const endDate = addWeeks(startDate, formData.weeks);
 
-            await createRecurringSchedule({
-                name: formData.name || `${formData.peptide} Protocol`,
-                peptide: formData.peptide,
+            const result = await createRecurringSchedule({
+                name: formData.name || `${formData.peptide.trim()} Protocol`,
+                peptide: formData.peptide.trim(),
                 dosage: parseFloat(formData.dosage),
                 unit: formData.unit,
                 time: formData.time,
                 recurrenceDays: formData.recurrenceDays,
                 notes: formData.notes || null
             }, startDate, endDate);
+
+            // Switch to calendar view to show the new schedules
+            if (result) {
+                setView('calendar');
+            }
         }
 
         setFormData({
@@ -166,6 +171,7 @@ const CalendarScheduler = () => {
             notes: '', name: '', recurrenceDays: [], weeks: 4
         });
         setIsFormOpen(false);
+        setShowAutocomplete(false);
     };
 
     const getScheduleDate = (schedule) => {
@@ -350,7 +356,7 @@ const CalendarScheduler = () => {
                                             value={formData.peptide}
                                             onChange={e => setFormData({ ...formData, peptide: e.target.value })}
                                             onFocus={() => setShowAutocomplete(true)}
-                                            placeholder="Search peptide..."
+                                            placeholder="Type or search peptide..."
                                             autoComplete="off"
                                             required
                                         />
@@ -497,7 +503,7 @@ const CalendarScheduler = () => {
                                             key={protocol.id}
                                             type="button"
                                             className={`${styles.quickProtocolBtn} ${JSON.stringify(formData.recurrenceDays) === JSON.stringify(protocol.days)
-                                                    ? styles.quickProtocolActive : ''
+                                                ? styles.quickProtocolActive : ''
                                                 }`}
                                             onClick={() => applyQuickProtocol(protocol)}
                                         >
@@ -549,7 +555,7 @@ const CalendarScheduler = () => {
                                             value={formData.peptide}
                                             onChange={e => setFormData({ ...formData, peptide: e.target.value })}
                                             onFocus={() => setShowAutocomplete(true)}
-                                            placeholder="Search peptide..."
+                                            placeholder="Type or search peptide..."
                                             autoComplete="off"
                                             required
                                         />
@@ -665,7 +671,7 @@ const CalendarScheduler = () => {
                                                     <span
                                                         key={day.value}
                                                         className={`${styles.protocolDayDot} ${template.recurrenceDays.includes(day.value)
-                                                                ? styles.protocolDayActive : ''
+                                                            ? styles.protocolDayActive : ''
                                                             }`}
                                                     >
                                                         {day.short}

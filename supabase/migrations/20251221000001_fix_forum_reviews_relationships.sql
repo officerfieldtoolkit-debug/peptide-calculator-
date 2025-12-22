@@ -56,7 +56,6 @@ SELECT
     r.rating,
     r.comment,
     r.created_at,
-    r.updated_at,
     p.email,
     p.full_name,
     p.avatar_url

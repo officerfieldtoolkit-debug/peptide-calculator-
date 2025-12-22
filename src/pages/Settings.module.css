@@ -119,12 +119,15 @@
 
 .inputWithIcon svg {
     position: absolute;
-    left: var(--space-md);
+    left: 16px;
     color: var(--text-muted);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .inputWithIcon input {
-    padding-left: calc(var(--space-md) * 3);
+    padding-left: 48px;
+    width: 100%;
 }
 
 .infoCard {

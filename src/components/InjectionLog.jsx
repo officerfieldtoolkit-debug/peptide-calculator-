@@ -101,17 +101,16 @@ const InjectionLog = () => {
 
     // Get data for a specific day
     const getDataForDay = useCallback((day) => {
-        const dayStart = new Date(day.getFullYear(), day.getMonth(), day.getDate());
-        const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+        const dayString = day.toDateString();
 
         const dayInjections = injections.filter(inj => {
             const injDate = new Date(inj.date);
-            return injDate >= dayStart && injDate < dayEnd;
+            return injDate.toDateString() === dayString;
         });
 
         const daySchedules = schedules.filter(sch => {
             const schDate = new Date(sch.date);
-            return schDate >= dayStart && schDate < dayEnd;
+            return schDate.toDateString() === dayString;
         });
 
         return { injections: dayInjections, schedules: daySchedules };
@@ -567,7 +566,7 @@ const InjectionLog = () => {
                                     <div className={styles.autocompleteWrapper}>
                                         <input
                                             type="text"
-                                            placeholder="Search peptides..."
+                                            placeholder="Type or search peptide..."
                                             value={formData.peptide}
                                             onChange={e => setFormData({ ...formData, peptide: e.target.value })}
                                             onFocus={() => setShowAutocomplete(true)}
