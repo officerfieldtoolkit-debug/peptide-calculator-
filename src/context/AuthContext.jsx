@@ -67,6 +67,17 @@ export const AuthProvider = ({ children }) => {
         if (error) throw error;
     };
 
+    const signInWithOAuth = async (provider) => {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider,
+            options: {
+                redirectTo: `${window.location.origin}/settings`
+            }
+        });
+        if (error) throw error;
+        return data;
+    };
+
     const mockLogin = () => {
         setUser({
             id: 'mock-user-id',
@@ -81,6 +92,7 @@ export const AuthProvider = ({ children }) => {
         loading,
         signUp,
         signIn,
+        signInWithOAuth,
         signOut,
         resetPassword,
         updatePassword,

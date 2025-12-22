@@ -13,21 +13,31 @@ const MOCK_REVIEWS = {
 
 export const getReviews = async (peptideName) => {
     try {
-        const { data, error } = await supabase
-            .from('reviews')
-            .select(`
-                *,
-                profiles:user_id (full_name)
-            `)
+        // First try to use the view with profiles
+        let { data, error } = await supabase
+            .from('reviews_with_profiles')
+            .select('*')
             .eq('peptide_name', peptideName)
             .order('created_at', { ascending: false });
 
+        // If view doesn't exist, fall back to regular reviews table
+        if (error && error.code === 'PGRST200') {
+            const result = await supabase
+                .from('reviews')
+                .select('*')
+                .eq('peptide_name', peptideName)
+                .order('created_at', { ascending: false });
+
+            data = result.data;
+            error = result.error;
+        }
+
         if (error) throw error;
 
-        // Transform data to include user name from profile
-        return data.map(review => ({
+        // Transform data to include user name
+        return (data || []).map(review => ({
             ...review,
-            user_name: review.profiles?.full_name || 'Anonymous'
+            user_name: review.full_name || 'Anonymous'
         }));
     } catch (error) {
         console.warn('Error fetching reviews (using mock data):', error);

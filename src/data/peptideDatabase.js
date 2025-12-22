@@ -1456,44 +1456,6 @@ export const PEPTIDE_DATABASE = {
         ]
     },
 
-    'SS-31': {
-        name: 'SS-31 (Elamipretide)',
-        category: 'Mitochondrial Health',
-        status: 'Clinical trials',
-        halfLife: '2-4 hours',
-        commonDosage: '40mg daily',
-        description: 'A mitochondrial-targeted peptide that restores mitochondrial bioenergetics and reduces oxidative stress.',
-        benefits: [
-            'Restores mitochondrial function',
-            'Reduces oxidative stress',
-            'Improves energy levels',
-            'Cardio and renoprotective effects'
-        ],
-        sideEffects: [
-            'Injection site irritation (common)',
-            'Dizziness',
-            'Headache'
-        ],
-        cons: [
-            'Very high dose required (40mg/day)',
-            'Extremely expensive',
-            'Injection site pain is a frequent complaint'
-        ],
-        warnings: [
-            'Monitor for allergic reactions',
-            'Limited availability outside trials'
-        ],
-        contraindications: [
-            'Pregnancy or breastfeeding'
-        ],
-        protocols: [],
-        administration: 'Subcutaneous injection daily',
-        storage: 'Refrigerate after reconstitution.',
-        researchLinks: [
-            'https://pubmed.ncbi.nlm.nih.gov/27188584/'
-        ]
-    },
-
     'NAD+': {
         name: 'NAD+ (Nicotinamide Adenine Dinucleotide)',
         category: 'Cellular Energy & Anti-Aging',

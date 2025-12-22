@@ -24,20 +24,40 @@ export const forumService = {
 
         if (catError) throw catError;
 
-        // Get topics with author info and reply count
-        const { data: topics, error: topicsError, count } = await supabase
-            .from('forum_topics')
-            .select(`
-        *,
-        author:profiles!forum_topics_user_id_fkey(full_name),
-        posts:forum_posts(count)
-      `, { count: 'exact' })
-            .eq('category_id', category.id)
-            .order('is_pinned', { ascending: false })
-            .order('created_at', { ascending: false })
-            .range(offset, offset + limit - 1);
+        // Get topics - try with profiles view first, fall back to simple query
+        let topics = [];
+        let count = 0;
 
-        if (topicsError) throw topicsError;
+        try {
+            // Try using the view
+            const { data, error, count: totalCount } = await supabase
+                .from('forum_topics_with_profiles')
+                .select('*', { count: 'exact' })
+                .eq('category_id', category.id)
+                .order('is_pinned', { ascending: false })
+                .order('created_at', { ascending: false })
+                .range(offset, offset + limit - 1);
+
+            if (!error) {
+                topics = data || [];
+                count = totalCount || 0;
+            } else {
+                throw error;
+            }
+        } catch (e) {
+            // Fallback to simple query without author
+            const { data, error, count: totalCount } = await supabase
+                .from('forum_topics')
+                .select('*', { count: 'exact' })
+                .eq('category_id', category.id)
+                .order('is_pinned', { ascending: false })
+                .order('created_at', { ascending: false })
+                .range(offset, offset + limit - 1);
+
+            if (error) throw error;
+            topics = (data || []).map(t => ({ ...t, full_name: null }));
+            count = totalCount || 0;
+        }
 
         return { category, topics, totalCount: count };
     },
@@ -45,38 +65,80 @@ export const forumService = {
     // Topics
     async getTopic(topicId) {
         // Increment view count
-        await supabase.rpc('increment_topic_views', { topic_id: topicId });
+        await supabase.rpc('increment_topic_views', { topic_id: topicId }).catch(() => { });
 
+        // Try view first, fall back to simple join
+        try {
+            const { data, error } = await supabase
+                .from('forum_topics_with_profiles')
+                .select('*')
+                .eq('id', topicId)
+                .single();
+
+            if (!error && data) {
+                // Get category info separately
+                const { data: category } = await supabase
+                    .from('forum_categories')
+                    .select('name, slug')
+                    .eq('id', data.category_id)
+                    .single();
+
+                return { ...data, category };
+            }
+        } catch (e) {
+            // Fall through to fallback
+        }
+
+        // Fallback
         const { data, error } = await supabase
             .from('forum_topics')
-            .select(`
-        *,
-        author:profiles!forum_topics_user_id_fkey(id, full_name),
-        category:forum_categories(name, slug)
-      `)
+            .select('*')
             .eq('id', topicId)
             .single();
 
         if (error) throw error;
-        return data;
+
+        // Get category separately
+        const { data: category } = await supabase
+            .from('forum_categories')
+            .select('name, slug')
+            .eq('id', data.category_id)
+            .single();
+
+        return { ...data, category, full_name: null };
     },
 
     async getTopicPosts(topicId, page = 1, limit = 20) {
         const offset = (page - 1) * limit;
 
+        // Try view first
+        try {
+            const { data, error, count } = await supabase
+                .from('forum_posts_with_profiles')
+                .select('*', { count: 'exact' })
+                .eq('topic_id', topicId)
+                .order('created_at', { ascending: true })
+                .range(offset, offset + limit - 1);
+
+            if (!error) {
+                return { posts: data || [], totalCount: count || 0 };
+            }
+        } catch (e) {
+            // Fall through
+        }
+
+        // Fallback
         const { data, error, count } = await supabase
             .from('forum_posts')
-            .select(`
-        *,
-        author:profiles!forum_posts_user_id_fkey(id, full_name)
-      `, { count: 'exact' })
+            .select('*', { count: 'exact' })
             .eq('topic_id', topicId)
             .order('created_at', { ascending: true })
             .range(offset, offset + limit - 1);
 
         if (error) throw error;
-        return { posts: data, totalCount: count };
+        return { posts: (data || []).map(p => ({ ...p, full_name: null })), totalCount: count || 0 };
     },
+
 
     async createTopic(categoryId, title, content) {
         const { data: { user } } = await supabase.auth.getUser();
@@ -131,10 +193,7 @@ export const forumService = {
                 user_id: user.id,
                 content
             })
-            .select(`
-        *,
-        author:profiles!forum_posts_user_id_fkey(id, full_name)
-      `)
+            .select('*')
             .single();
 
         if (error) throw error;
@@ -214,35 +273,64 @@ export const forumService = {
 
     // Search
     async searchTopics(query, limit = 20) {
+        try {
+            const { data, error } = await supabase
+                .from('forum_topics_with_profiles')
+                .select('*')
+                .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
+                .order('created_at', { ascending: false })
+                .limit(limit);
+
+            if (!error) return data || [];
+        } catch (e) {
+            // Fall through
+        }
+
+        // Fallback
         const { data, error } = await supabase
             .from('forum_topics')
-            .select(`
-        *,
-        author:profiles!forum_topics_user_id_fkey(full_name),
-        category:forum_categories(name, slug)
-      `)
+            .select('*')
             .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
             .order('created_at', { ascending: false })
             .limit(limit);
 
         if (error) throw error;
-        return data;
+        return data || [];
     },
 
     // Recent activity
     async getRecentTopics(limit = 10) {
+        try {
+            const { data, error } = await supabase
+                .from('forum_topics_with_profiles')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(limit);
+
+            if (!error && data) {
+                // Get categories for each topic
+                const categoryIds = [...new Set(data.map(t => t.category_id))];
+                const { data: categories } = await supabase
+                    .from('forum_categories')
+                    .select('id, name, slug, color')
+                    .in('id', categoryIds);
+
+                const categoryMap = (categories || []).reduce((acc, c) => ({ ...acc, [c.id]: c }), {});
+                return data.map(t => ({ ...t, category: categoryMap[t.category_id] }));
+            }
+        } catch (e) {
+            // Fall through
+        }
+
+        // Fallback
         const { data, error } = await supabase
             .from('forum_topics')
-            .select(`
-        *,
-        author:profiles!forum_topics_user_id_fkey(full_name),
-        category:forum_categories(name, slug, color)
-      `)
+            .select('*')
             .order('created_at', { ascending: false })
             .limit(limit);
 
         if (error) throw error;
-        return data;
+        return data || [];
     },
 
     // Stats
