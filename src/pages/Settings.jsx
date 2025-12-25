@@ -210,6 +210,7 @@ const Settings = () => {
                                         value={profile.email}
                                         disabled
                                         className={styles.disabledInput}
+                                        style={{ paddingLeft: '48px' }}
                                     />
                                 </div>
                             </div>
