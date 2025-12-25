@@ -10,6 +10,7 @@ import { emailService } from '../services/emailService';
 import { exportService } from '../services/exportService';
 import { getUserReviews, deleteReview } from '../services/reviewService';
 import { useInjections } from '../hooks/useInjections';
+import { useTwoFactor } from '../hooks/useTwoFactor';
 import ShareProgress from '../components/ShareProgress';
 import DataManagement from '../components/DataManagement';
 import styles from './Settings.module.css';
@@ -19,6 +20,19 @@ const Settings = () => {
     const { theme, toggleTheme, setThemeMode } = useTheme();
     const { t, i18n } = useTranslation();
     const { injections } = useInjections();
+    const {
+        isEnabled: is2FAEnabled,
+        isEnrolling: is2FAEnrolling,
+        isLoading: is2FALoading,
+        qrCodeUrl,
+        secret: twoFactorSecret,
+        startEnrollment,
+        verifyAndEnable,
+        disableTwoFactor,
+        cancelEnrollment,
+        error: twoFactorError
+    } = useTwoFactor();
+    const [twoFactorCode, setTwoFactorCode] = useState('');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState(null);
@@ -436,10 +450,91 @@ const Settings = () => {
                                 <Shield size={24} />
                                 <div>
                                     <h3>2FA Status</h3>
-                                    <p className={styles.statusInactive}>Not Enabled</p>
+                                    {is2FALoading ? (
+                                        <p className={styles.statusInactive}>Loading...</p>
+                                    ) : is2FAEnabled ? (
+                                        <p className={styles.statusActive}>Enabled</p>
+                                    ) : (
+                                        <p className={styles.statusInactive}>Not Enabled</p>
+                                    )}
                                 </div>
-                                <button className={styles.secondaryBtn}>Enable 2FA</button>
+                                {!is2FAEnabled && !is2FAEnrolling && !is2FALoading && (
+                                    <button className={styles.secondaryBtn} onClick={startEnrollment}>Enable 2FA</button>
+                                )}
+                                {is2FAEnabled && (
+                                    <button className={styles.dangerBtn} onClick={disableTwoFactor}>Disable 2FA</button>
+                                )}
                             </div>
+
+                            {twoFactorError && (
+                                <div className="alert alert-error" style={{ marginBottom: '1rem', padding: '10px', borderRadius: '8px', background: 'rgba(255,0,0,0.1)', color: '#ff4d4d' }}>
+                                    {twoFactorError}
+                                </div>
+                            )}
+
+                            {is2FAEnrolling && (
+                                <div className="card glass-panel" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+                                    <h4 style={{ marginTop: 0, color: 'var(--text-primary)' }}>Setup 2FA</h4>
+                                    <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+                                        Scan this QR code with your authenticator app (like Google Authenticator or Authy).
+                                    </p>
+
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                        {qrCodeUrl && (
+                                            <div style={{ background: 'white', padding: '10px', borderRadius: '8px', marginBottom: '1rem' }}>
+                                                <img src={qrCodeUrl} alt="2FA QR Code" width="180" height="180" />
+                                            </div>
+                                        )}
+
+                                        <div style={{ textAlign: 'center' }}>
+                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginBottom: '0.25rem' }}>Manual Entry Code:</p>
+                                            <code style={{
+                                                display: 'block',
+                                                background: 'var(--bg-input)',
+                                                padding: '0.5rem 1rem',
+                                                borderRadius: '4px',
+                                                fontFamily: 'monospace',
+                                                letterSpacing: '1px',
+                                                color: 'var(--accent-primary)',
+                                                border: '1px solid var(--glass-border)'
+                                            }}>
+                                                {twoFactorSecret}
+                                            </code>
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.formGroup}>
+                                        <label>Verification Code</label>
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <input
+                                                type="text"
+                                                placeholder="Enter 6-digit code"
+                                                value={twoFactorCode}
+                                                onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                                style={{ flex: 1 }}
+                                            />
+                                            <button
+                                                className="btn-primary"
+                                                onClick={() => verifyAndEnable(twoFactorCode)}
+                                                disabled={twoFactorCode.length !== 6}
+                                            >
+                                                Verify
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        className={styles.secondaryBtn}
+                                        onClick={() => {
+                                            cancelEnrollment();
+                                            setTwoFactorCode('');
+                                        }}
+                                        style={{ width: '100%', marginTop: '0.5rem', justifyContent: 'center' }}
+                                    >
+                                        Cancel Setup
+                                    </button>
+                                </div>
+                            )}
 
                             <div className={styles.divider}></div>
 
