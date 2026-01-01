@@ -331,7 +331,7 @@ export const PEPTIDE_DATABASE = {
         ]
     },
 
-    'TB-500': {
+    'TB-500 (Thymosin Beta-4)': {
         name: 'TB-500 (Thymosin Beta-4)',
         category: 'Healing Peptide',
         status: 'Research chemical; WADA banned',
@@ -657,7 +657,7 @@ export const PEPTIDE_DATABASE = {
         ]
     },
 
-    'GHK-Cu': {
+    'GHK-Cu (Copper Peptide)': {
         name: 'GHK-Cu (Copper Peptide)',
         category: 'Healing & Anti-Aging',
         status: 'Cosmeceutical/research',
@@ -1301,7 +1301,7 @@ export const PEPTIDE_DATABASE = {
         ]
     },
 
-    'DSIP': {
+    'DSIP (Delta Sleep-Inducing Peptide)': {
         name: 'DSIP (Delta Sleep-Inducing Peptide)',
         category: 'Neurological & Sleep',
         status: 'Research chemical',
@@ -1380,7 +1380,7 @@ export const PEPTIDE_DATABASE = {
         ]
     },
 
-    'ARA-290': {
+    'ARA-290 (Cibinetide)': {
         name: 'ARA-290 (Cibinetide)',
         category: 'Healing & Neuropathy',
         status: 'Research chemical',
@@ -1456,7 +1456,7 @@ export const PEPTIDE_DATABASE = {
         ]
     },
 
-    'NAD+': {
+    'NAD+ (Nicotinamide Adenine Dinucleotide)': {
         name: 'NAD+ (Nicotinamide Adenine Dinucleotide)',
         category: 'Cellular Energy & Anti-Aging',
         status: 'Supplement/Therapy',
@@ -1615,7 +1615,7 @@ export const PEPTIDE_DATABASE = {
         ]
     },
 
-    'LL-37': {
+    'LL-37 (Cathelicidin)': {
         name: 'LL-37 (Cathelicidin)',
         category: 'Antimicrobial & Immune',
         status: 'Research chemical',
@@ -1696,85 +1696,7 @@ export const PEPTIDE_DATABASE = {
         ]
     },
 
-    'Semax': {
-        name: 'Semax',
-        category: 'Nootropic & Cognitive',
-        status: 'Approved in Russia',
-        halfLife: 'Short (minutes to hours effect)',
-        commonDosage: '200-1000mcg daily (Nasal)',
-        description: 'A heptapeptide analog of ACTH used for cognitive enhancement and stroke recovery.',
-        benefits: [
-            'Increased focus and clarity',
-            'Improved memory',
-            'Neuroprotection',
-            'Mood elevation (BDNF increase)',
-            'Reduced mental fatigue'
-        ],
-        sideEffects: [
-            'Mild irritation (nasal)',
-            'Headache',
-            'Anxiety (if prone)'
-        ],
-        cons: [
-            'Must be kept refrigerated (fragile)',
-            'Nasal spray shelf life is short',
-            'Effects are subtle for some'
-        ],
-        warnings: [
-            'May interact with stimulants',
-            'Store properly to maintain potency'
-        ],
-        contraindications: [
-            'Pregnancy or breastfeeding',
-            'History of seizures'
-        ],
-        protocols: [],
-        administration: 'Intranasal spray or subcutaneous injection',
-        storage: 'Refrigerate always.',
-        researchLinks: [
-            'https://pubmed.ncbi.nlm.nih.gov/16996699/'
-        ]
-    },
 
-    'Cerebrolysin': {
-        name: 'Cerebrolysin',
-        category: 'Neurotrophic',
-        status: 'Approved in many countries (not US)',
-        halfLife: 'Short',
-        commonDosage: '5-10ml daily (IM/IV)',
-        description: 'A peptide mixture derived from pig brains, rich in neurotrophic factors like BDNF and NGF.',
-        benefits: [
-            'Neuroprotection and repair',
-            'Stroke and TBI recovery',
-            'Dementia/Alzheimer\'s support',
-            'Improved cognition'
-        ],
-        sideEffects: [
-            'Flu-like symptoms',
-            'Dizziness',
-            'Injection site pain (large volume)'
-        ],
-        cons: [
-            'Requires large volume injections (5ml+)',
-            'Animal derived (not vegan)',
-            'Expensive for a full cycle'
-        ],
-        warnings: [
-            'Risk of allergic reaction',
-            'Do not use if kidney failure'
-        ],
-        contraindications: [
-            'Epilepsy',
-            'Severe renal impairment',
-            'Pregnancy'
-        ],
-        protocols: [],
-        administration: 'Intramuscular (deep) or IV infusion',
-        storage: 'Room temperature (ampoules).',
-        researchLinks: [
-            'https://pubmed.ncbi.nlm.nih.gov/26487439/'
-        ]
-    },
 
     'IGF-1 LR3': {
         name: 'IGF-1 LR3',
@@ -1893,7 +1815,7 @@ export const PEPTIDE_DATABASE = {
         ]
     },
 
-    'VIP': {
+    'VIP (Vasoactive Intestinal Peptide)': {
         name: 'VIP (Vasoactive Intestinal Peptide)',
         category: 'Immune & CIRS',
         status: 'Prescription/Compound',
