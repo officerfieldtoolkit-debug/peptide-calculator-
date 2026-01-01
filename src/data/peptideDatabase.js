@@ -2240,6 +2240,730 @@ export const PEPTIDE_DATABASE = {
         researchLinks: [
             'https://pubmed.ncbi.nlm.nih.gov/1601267/'
         ]
+    },
+
+    'Cagrilintide': {
+        name: 'Cagrilintide',
+        category: 'Weight Loss (Amylin)',
+        status: 'Investigational (Phase 3)',
+        halfLife: 'Approx. 7 days',
+        commonDosage: '0.3mg - 2.4mg weekly',
+        description: 'A long-acting amylin analog that suppresses appetite via a different pathway than GLP-1s. Often combined with Semaglutide (CagriSema).',
+        benefits: [
+            'Potent satiety signaling',
+            'Significant weight loss',
+            'Synergistic effect with GLP-1s',
+            'Slower gastric emptying'
+        ],
+        sideEffects: [
+            'Nausea (common)',
+            'Vomiting',
+            'Reduced appetite'
+        ],
+        cons: [
+            'Expensive',
+            'GI effects can be compounding with GLP-1s',
+            'Not yet fully approved independent of trials'
+        ],
+        warnings: [
+            'Monitor caloric intake',
+            'Stay hydrated'
+        ],
+        contraindications: [
+            'Gastroparesis',
+            'Pregnancy'
+        ],
+        protocols: [],
+        administration: 'Subcutaneous injection',
+        storage: 'Refrigerate.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/36024982/'
+        ]
+    },
+
+    'Mazdutide': {
+        name: 'Mazdutide',
+        category: 'Dual GLP-1/Glucagon Agonist',
+        status: 'Investigational',
+        halfLife: 'Weekly dosing',
+        commonDosage: '3mg - 9mg weekly (Trial)',
+        description: 'A dual agonist of GLP-1 and Glucagon receptors, designed to promote weight loss and energy expenditure.',
+        benefits: [
+            'High weight loss potential',
+            'Increases energy expenditure',
+            'Reduces liver fat'
+        ],
+        sideEffects: [
+            'Increased heart rate',
+            'Nausea',
+            'Arrhythmia risk (theoretical)'
+        ],
+        cons: [
+            'Glucagon component may raise blood sugar in some (though offset by GLP-1)',
+            'Heart rate increase is common',
+            'Early development stage'
+        ],
+        warnings: [
+            'Monitor heart rate closely',
+            'Monitor blood glucose'
+        ],
+        contraindications: [
+            'Cardiovascular disease',
+            'Pregnancy'
+        ],
+        protocols: [],
+        administration: 'Subcutaneous injection',
+        storage: 'Refrigerate.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/35504283/'
+        ]
+    },
+
+    'Humanin': {
+        name: 'Humanin',
+        category: 'Mitochondrial',
+        status: 'Research chemical',
+        halfLife: 'Short (hours)',
+        commonDosage: '2-5mg daily (Short cycles)',
+        description: 'A mitochondrial-derived peptide with potent cytoprotective, metabolic, and neuroprotective effects.',
+        benefits: [
+            'Mitochondrial biogenesis',
+            'Protects against oxidative stress',
+            'Improves insulin sensitivity',
+            'Neuroprotection (Alzheimer\'s research)'
+        ],
+        sideEffects: [
+            'Little known side effects',
+            'Injection site pain'
+        ],
+        cons: [
+            'Very expensive',
+            'Requires high doses',
+            'Limited human data'
+        ],
+        warnings: [
+            'May inhibit apoptosis (theoretical cancer risk in existing tumors)',
+            'Short term use recommended'
+        ],
+        contraindications: [
+            'Active malignancy',
+            'Pregnancy'
+        ],
+        protocols: [],
+        administration: 'Subcutaneous injection',
+        storage: 'Refrigerate.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/11373683/'
+        ]
+    },
+
+    'B7-33': {
+        name: 'B7-33',
+        category: 'Healing & Fibrosis',
+        status: 'Research chemical',
+        halfLife: 'Short',
+        commonDosage: '1-2mg daily (split doses)',
+        description: 'A functionally selective relaxin analog designed to reduce fibrosis (scar tissue) without the side effects of native relaxin.',
+        benefits: [
+            'Reduces fibrosis / scar tissue',
+            'Does not dilate blood vessels (unlike Relaxin)',
+            'Heart failure research',
+            'Anti-inflammatory'
+        ],
+        sideEffects: [
+            'Mild irritation'
+        ],
+        cons: [
+            'Short half-life requiring frequent dosing',
+            'Hard to source high purity',
+            'Niche application'
+        ],
+        warnings: [
+            'Effects on connective tissue integrity'
+        ],
+        contraindications: [
+            'Pregnancy',
+            'Ehlers-Danlos Syndrome (theoretical)'
+        ],
+        protocols: [],
+        administration: 'Subcutaneous injection',
+        storage: 'Refrigerate.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/27018318/'
+        ]
+    },
+
+    'Pinealon': {
+        name: 'Pinealon',
+        category: 'Bioregulator (Brain)',
+        status: 'Supplement (Russia)',
+        halfLife: 'Short',
+        commonDosage: '5-10mg daily (Oral/SubQ) for 10-20 days',
+        description: 'A synthetic tripeptide bioregulator for the brain, noted for correction of brain function and jet lag.',
+        benefits: [
+            'Improves cognitive function',
+            'Regulates circadian rhythm',
+            'Neuroprotection',
+            'Reduces oxidative stress in brain'
+        ],
+        sideEffects: [
+            'None reported typically'
+        ],
+        cons: [
+            'Effects are subtle/long-term',
+            'Course-based dosing'
+        ],
+        warnings: [
+            'None specific'
+        ],
+        contraindications: [
+            'Pregnancy'
+        ],
+        protocols: [],
+        administration: 'Oral or Subcutaneous injection',
+        storage: 'Cool dry place (if capsule) / Refrigerator (if peptide).',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/17552093/'
+        ]
+    },
+
+    'Vilon': {
+        name: 'Vilon',
+        category: 'Bioregulator (Immune)',
+        status: 'Research/Supplement',
+        halfLife: 'Short',
+        commonDosage: '10mg daily course',
+        description: 'A synthetic dipeptide bioregulator of the thymus, stimulating immune function and regeneration.',
+        benefits: [
+            'Immune modulation',
+            'Thymus regeneration',
+            'Reduced inflammation',
+            'Anti-aging'
+        ],
+        sideEffects: [
+            'None reported typically'
+        ],
+        cons: [
+            'Hard to find data in English'
+        ],
+        warnings: [
+            'Immune stimulation caution (autoimmune)'
+        ],
+        contraindications: [
+            'Active autoimmune flare (caution)',
+            'Pregnancy'
+        ],
+        protocols: [],
+        administration: 'Subcutaneous injection or Oral',
+        storage: 'Refrigerate.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/12577695/'
+        ]
+    },
+
+    'Vesugen': {
+        name: 'Vesugen',
+        category: 'Bioregulator (Vascular)',
+        status: 'Supplement',
+        halfLife: 'Short',
+        commonDosage: '10mg daily course',
+        description: 'A tripeptide bioregulator for the vascular system, promoting blood vessel health.',
+        benefits: [
+            'Improves circulation',
+            'Strengthens vessel walls',
+            'Atherosclerosis prevention',
+            'Blood pressure normalization support'
+        ],
+        sideEffects: [
+            'None reported'
+        ],
+        cons: [
+            'Subtle effects'
+        ],
+        warnings: [
+            'Check blood pressure'
+        ],
+        contraindications: [
+            'Pregnancy'
+        ],
+        protocols: [],
+        administration: 'Oral or Subcutaneous injection',
+        storage: 'Refrigerate.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/18314644/'
+        ]
+    },
+
+    'Snap-8': {
+        name: 'Snap-8',
+        category: 'Cosmetic Peptide',
+        status: 'Cosmetic Ingredient',
+        halfLife: 'N/A (Topical)',
+        commonDosage: '3-10% topical concentration',
+        description: 'An octapeptide that reduces the depth of wrinkles caused by facial muscle contractions (Botox-like effect).',
+        benefits: [
+            'Reduces expression lines',
+            'Non-invasive',
+            'Safe alternative to Botox'
+        ],
+        sideEffects: [
+            'Skin irritation (rare)'
+        ],
+        cons: [
+            'Must be used daily topical',
+            'Effects revert if stopped',
+            'Less potent than injectable neurotoxins'
+        ],
+        warnings: [
+            'For external use only'
+        ],
+        contraindications: [
+            'Skin sensitivity'
+        ],
+        protocols: [],
+        administration: 'Topical cream/serum',
+        storage: 'Room temp (formulated).',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/19056056/'
+        ]
+    },
+
+    'Argireline': {
+        name: 'Argireline',
+        category: 'Cosmetic Peptide',
+        status: 'Cosmetic Ingredient',
+        halfLife: 'N/A (Topical)',
+        commonDosage: '5-10% topical concentration',
+        description: 'Acetyle Hexapeptide-3/8, known as "Botox in a jar", inhibits neurotransmitter release to relax facial muscles.',
+        benefits: [
+            'Reduces forehead lines/crow\'s feet',
+            'Moisturizing properties',
+            'Non-toxic'
+        ],
+        sideEffects: [
+            'Skin irritation',
+            'Redness'
+        ],
+        cons: [
+            'Penetration is limited',
+            'Subtle results vs injectables'
+        ],
+        warnings: [
+            'Topical use only'
+        ],
+        contraindications: [
+            'Hypersensitivity'
+        ],
+        protocols: [],
+        administration: 'Topical application',
+        storage: 'Room temp.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/18498523/'
+        ]
+    },
+
+    'Gonadorelin': {
+        name: 'Gonadorelin',
+        category: 'Hormone Support',
+        status: 'Prescription/Research',
+        halfLife: '10-40 minutes',
+        commonDosage: '100mcg pulsatile (specific protocols)',
+        description: 'Synthetic GnRH used to stimulate the pituitary to release LH and FSH, restoring testosterone production.',
+        benefits: [
+            'Restores HPTA axis function',
+            'Increases testosterone',
+            'Preserves testicular size',
+            'Fertility support'
+        ],
+        sideEffects: [
+            'Hot flashes',
+            'Headache',
+            'Desensitization if dosed continuously (castration effect)'
+        ],
+        cons: [
+            'Very short half-life requires pulsed dosing for best effect',
+            'Continuous use shuts down HPTA (paradoxical effect)'
+        ],
+        warnings: [
+            'Dosing timing is critical',
+            'Overuse leads to shutdown'
+        ],
+        contraindications: [
+            'Prostate cancer',
+            'Pregnancy'
+        ],
+        protocols: [],
+        administration: 'Subcutaneous injection',
+        storage: 'Refrigerate.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/458359/'
+        ]
+    },
+
+    'Orexin A': {
+        name: 'Orexin A',
+        category: 'Nootropic & Wakefulness',
+        status: 'Research chemical',
+        halfLife: 'Short',
+        commonDosage: 'Intranasal (variable)',
+        description: 'A neuropeptide that regulates arousal, wakefulness, and appetite. Used for narcolepsy and fatigue.',
+        benefits: [
+            'Promotes wakefulness',
+            'Improves cognitive performance',
+            'Combats sleep deprivation effects'
+        ],
+        sideEffects: [
+            'Anxiety',
+            'Insomnia',
+            'Increased appetite'
+        ],
+        cons: [
+            'Hard to cross blood-brain barrier (needs nasal/special delivery)',
+            'Expensive'
+        ],
+        warnings: [
+            'Do not use if prone to anxiety',
+            'Will disrupt sleep'
+        ],
+        contraindications: [
+            'Insomnia',
+            'Anxiety disorders'
+        ],
+        protocols: [],
+        administration: 'Intranasal spray',
+        storage: 'Refrigerate.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/9491897/'
+        ]
+    },
+
+    'Larazotide (AT-1001)': {
+        name: 'Larazotide (AT-1001)',
+        category: 'Gut Health',
+        status: 'Investigational (Celiac)',
+        halfLife: 'Local gut action',
+        commonDosage: '0.5mg - 2mg Oral',
+        description: 'A tight junction regulator peptide that reduces intestinal permeability (leaky gut).',
+        benefits: [
+            'Reduces gut permeability',
+            'Helps with Celiac symptoms',
+            'Systemic inflammation reduction'
+        ],
+        sideEffects: [
+            'Mild GI upset',
+            'Headache'
+        ],
+        cons: [
+            'Must be timed with meals',
+            'Limited availability outside trials'
+        ],
+        warnings: [
+            'Not a cure for Celiac (still need gluten free diet)'
+        ],
+        contraindications: [
+            'Pregnancy'
+        ],
+        protocols: [],
+        administration: 'Oral capsule',
+        storage: 'Cool dry place.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/22902773/'
+        ]
+    },
+
+    'Adipotide': {
+        name: 'Adipotide',
+        category: 'Fat Loss (Experimental)',
+        status: 'Research chemical',
+        halfLife: 'Unknown',
+        commonDosage: 'Highly experimental',
+        description: 'A pro-apoptotic peptide that targets blood supply of white fat cells, causing them to die.',
+        benefits: [
+            'Rapid, massive fat loss (in animals)'
+        ],
+        sideEffects: [
+            'Kidney toxicity (Major risk)',
+            'Dehydration',
+            'Lesions'
+        ],
+        cons: [
+            'High risk of renal failure if dosed wrong',
+            'Painful mechanism',
+            'Not safe for general use'
+        ],
+        warnings: [
+            'Known to cause kidney lesions in monkeys',
+            'EXTREME CAUTION required'
+        ],
+        contraindications: [
+            'Kidney issues',
+            'Human use generally discouraged'
+        ],
+        protocols: [],
+        administration: 'Subcutaneous injection',
+        storage: 'Freeze.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/22020228/'
+        ]
+    },
+
+    'Tesofensine': {
+        name: 'Tesofensine',
+        category: 'Metabolic Agent (Research)',
+        status: 'Research Chemical',
+        halfLife: '9 days (~220 hours)',
+        commonDosage: '0.25mg - 0.5mg daily (Oral)',
+        description: 'A serotonin-noradrenaline-dopamine reuptake inhibitor originally for Parkinson\'s/Alzheimer\'s, now produced for weight loss.',
+        benefits: [
+            'Powerful appetite suppression',
+            'Increased metabolic rate',
+            'Mood enhancement'
+        ],
+        sideEffects: [
+            'Insomnia',
+            'Dry mouth',
+            'Elevated heart rate',
+            'Anxiety',
+            'Constipation'
+        ],
+        cons: [
+            'Long half-life means side effects last a long time',
+            'Stimulant-like effects',
+            'Sleep disruption common'
+        ],
+        warnings: [
+            'Monitor blood pressure and heart rate',
+            'Taper off slowly'
+        ],
+        contraindications: [
+            'Uncontrolled hypertension',
+            'Glaucoma',
+            'MAOI use'
+        ],
+        protocols: [],
+        administration: 'Oral capsule',
+        storage: 'Room temperature.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/18974309/'
+        ]
+    },
+
+    'Cardarine (GW-501516)': {
+        name: 'Cardarine (GW-501516)',
+        category: 'Performance / PPAR',
+        status: 'Research Chemical',
+        halfLife: '12-24 hours',
+        commonDosage: '10-20mg daily',
+        description: 'A PPAR-delta agonist that switches energy preference from glucose to lipids, enhancing endurance and fat loss.',
+        benefits: [
+            'Massive endurance boost',
+            'Fat burning',
+            'Improved lipid profile (raises HDL, lowers LDL)'
+        ],
+        sideEffects: [
+            'None acute usually',
+            'Cancer risk (black box - controversial animal studies)'
+        ],
+        cons: [
+            'Development abandoned by Pharma due to cancer development in mice (at high constant doses)',
+            'Not hormonal but affects metabolism'
+        ],
+        warnings: [
+            'Potential carcinogen in long term/high dose use',
+            'Use at own risk'
+        ],
+        contraindications: [
+            'Active cancer',
+            'Health anxiety'
+        ],
+        protocols: [],
+        administration: 'Oral liquid/capsule',
+        storage: 'Room temperature.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/15138255/'
+        ]
+    },
+
+    'Stenabolic (SR-9009)': {
+        name: 'Stenabolic (SR-9009)',
+        category: 'Performance / Rev-ErbA',
+        status: 'Research Chemical',
+        halfLife: '4 hours',
+        commonDosage: '10-30mg daily (dosed 3-4x)',
+        description: 'A Rev-ErbA agonist that affects circadian rhythm and metabolism, often called "exercise in a bottle".',
+        benefits: [
+            'Endurance increase',
+            'Metabolic boost',
+            'Reduced cholesterol',
+            'Decreased anxiety'
+        ],
+        sideEffects: [
+            'Insomnia',
+            'Wakefulness'
+        ],
+        cons: [
+            'Very poor oral bioavailability (best injected or sublingual)',
+            'Short half-life requires frequent dosing'
+        ],
+        warnings: [
+            'Timing matters (can disrupt sleep)'
+        ],
+        contraindications: [
+            'Sleep disorders'
+        ],
+        protocols: [],
+        administration: 'Sublingual, Oral, or Injection',
+        storage: 'Room temperature.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/22460951/'
+        ]
+    },
+
+    'Enclomiphene': {
+        name: 'Enclomiphene',
+        category: 'Hormone Support (SERM)',
+        status: 'Prescription/Research',
+        halfLife: '10 hours',
+        commonDosage: '6.25mg - 25mg daily',
+        description: 'The preferred isomer of Clomid, antagonizing estrogen at the pituitary to stimulate natural testosterone production without estrogenic side effects of zuclomiphene.',
+        benefits: [
+            'Raises natural testosterone',
+            'Maintains fertility',
+            'Fewer emotional side effects than Clomid'
+        ],
+        sideEffects: [
+            'Reduced IGF-1 levels',
+            'Vision changes (floaters) - rare but serious',
+            'Libido variance'
+        ],
+        cons: [
+            'Lowers IGF-1 which counters some muscle building benefits',
+            'Vision side effects require immediate cessation'
+        ],
+        warnings: [
+            'Stop if vision changes occur',
+            'Monitor Estradiol'
+        ],
+        contraindications: [
+            'History of eye disorders',
+            'Pituitary tumor'
+        ],
+        protocols: [],
+        administration: 'Oral capsule',
+        storage: 'Room temperature.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/24369076/'
+        ]
+    },
+
+    'NA-Semax Amidate': {
+        name: 'NA-Semax Amidate',
+        category: 'Nootropic (Advanced)',
+        status: 'Research Chemical',
+        halfLife: 'Medium',
+        commonDosage: '200-600mcg daily (Nasal)',
+        description: 'Acetylated and amidated version of Semax for improved stability, blood-brain barrier penetration, and potency.',
+        benefits: [
+            'Stronger focus than regular Semax',
+            'Longer duration',
+            'Neuroprotection',
+            'Mental clarity'
+        ],
+        sideEffects: [
+            'Overstimulation',
+            'Headache',
+            'Irritability'
+        ],
+        cons: [
+            'Expensive',
+            'Fragile peptide (heat sensitive)'
+        ],
+        warnings: [
+            'Start low dose',
+            'Keep refrigerated'
+        ],
+        contraindications: [
+            'History of seizures',
+            'Anxiety'
+        ],
+        protocols: [],
+        administration: 'Nasal spray',
+        storage: 'Refrigerate.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/16996699/'
+        ]
+    },
+
+    'NA-Selank Amidate': {
+        name: 'NA-Selank Amidate',
+        category: 'Anxiolytic (Advanced)',
+        status: 'Research Chemical',
+        halfLife: 'Medium',
+        commonDosage: '200-600mcg daily (Nasal)',
+        description: 'Acetylated and amidated Selank, offering enhanced potency and duration for anxiety relief.',
+        benefits: [
+            'Potent anxiety reduction',
+            'No sedation',
+            'Mood elevation',
+            'Immune modulation'
+        ],
+        sideEffects: [
+            'Lethargy (at high doses)',
+            'Brain fog'
+        ],
+        cons: [
+            'Expensive',
+            'Effects vary by individual'
+        ],
+        warnings: [
+            'Keep refrigerated'
+        ],
+        contraindications: [
+            'Pregnancy'
+        ],
+        protocols: [],
+        administration: 'Nasal spray',
+        storage: 'Refrigerate.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/18577961/'
+        ]
+    },
+
+    'ACE-031': {
+        name: 'ACE-031',
+        category: 'Muscle Growth (Myostatin)',
+        status: 'Research Chemical (Discontinued Pharma)',
+        halfLife: '10-15 days',
+        commonDosage: '1mg/kg (Experimental)',
+        description: 'A soluble fusion protein that binds to myostatin and other negative muscle regulators, preventing them from acting.',
+        benefits: [
+            'Explosive muscle growth',
+            'Fat loss'
+        ],
+        sideEffects: [
+            'Nose bleeds (common in trials)',
+            'Gum bleeding',
+            'Telangiectasia (dilated blood vessels)'
+        ],
+        cons: [
+            'Human trials stopped due to bleeding issues',
+            'Very expensive',
+            'Joint dryness'
+        ],
+        warnings: [
+            'Do not use; known safety issues in trials',
+            'Monitor mucosal bleeding'
+        ],
+        contraindications: [
+            'Bleeding disorders',
+            'Hypertension'
+        ],
+        protocols: [],
+        administration: 'Subcutaneous injection',
+        storage: 'Refrigerate.',
+        researchLinks: [
+            'https://pubmed.ncbi.nlm.nih.gov/23168536/'
+        ]
     }
 };
 
