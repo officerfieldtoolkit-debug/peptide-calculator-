@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Syringe, Info, ChevronDown, Bookmark, BookmarkCheck, Trash2, RotateCcw, Beaker, Droplets, FlaskConical, Sparkles } from 'lucide-react';
 import styles from './ReconstitutionCalculator.module.css';
 import SyringeVisualizer from './SyringeVisualizer';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 import { usePeptides } from '../hooks/usePeptides';
 
 // Local storage key for saved calculations
@@ -28,6 +30,7 @@ const getSavedCalculations = () => {
 };
 
 const ReconstitutionCalculator = () => {
+  const { user } = useAuth();
   const { peptides } = usePeptides();
   // Form state - use strings to allow empty input and prevent leading zeros
   const [selectedPeptide, setSelectedPeptide] = useState('');
@@ -44,9 +47,40 @@ const ReconstitutionCalculator = () => {
 
   // UI state
   const [showAutocomplete, setShowAutocomplete] = useState(false);
-  const [savedCalcs, setSavedCalcs] = useState(getSavedCalculations);
+  const [savedCalcs, setSavedCalcs] = useState([]);
   const [showSaved, setShowSaved] = useState(false);
   const autocompleteRef = useRef(null);
+
+  // Load saved calculations on mount
+  useEffect(() => {
+    const loadSaved = async () => {
+      if (user) {
+        // Load from Supabase
+        const { data, error } = await supabase
+          .from('user_calculations')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (data && !error) {
+          // Map DB snake_case to frontend camelCase
+          const formatted = data.map(c => ({
+            id: c.id,
+            peptide: c.peptide_name,
+            vialAmount: c.vial_amount,
+            waterAmount: c.water_amount,
+            doseAmount: c.dose_amount,
+            doseUnit: c.dose_unit,
+            syringeType: c.syringe_type
+          }));
+          setSavedCalcs(formatted);
+        }
+      } else {
+        // Load from LocalStorage
+        setSavedCalcs(getSavedCalculations());
+      }
+    };
+    loadSaved();
+  }, [user]);
 
   // Filter peptides for autocomplete
   const filteredPeptides = useMemo(() => {
@@ -156,9 +190,8 @@ const ReconstitutionCalculator = () => {
   };
 
   // Save current calculation
-  const saveCalculation = () => {
-    const newCalc = {
-      id: Date.now(),
+  const saveCalculation = async () => {
+    const calcData = {
       peptide: selectedPeptide || 'Custom',
       vialAmount: numVialAmount,
       waterAmount: numWaterAmount,
@@ -167,9 +200,38 @@ const ReconstitutionCalculator = () => {
       syringeType
     };
 
-    const updated = [newCalc, ...savedCalcs.slice(0, 9)]; // Keep max 10
-    setSavedCalcs(updated);
-    localStorage.setItem(SAVED_CALCS_KEY, JSON.stringify(updated));
+    if (user) {
+      // Save to Supabase
+      const { data, error } = await supabase
+        .from('user_calculations')
+        .insert([{
+          user_id: user.id,
+          peptide_name: calcData.peptide,
+          vial_amount: calcData.vialAmount,
+          water_amount: calcData.waterAmount,
+          dose_amount: calcData.doseAmount,
+          dose_unit: calcData.doseUnit,
+          syringe_type: calcData.syringeType
+        }])
+        .select()
+        .single();
+
+      if (data && !error) {
+        setSavedCalcs(prev => [{
+          id: data.id,
+          ...calcData
+        }, ...prev]);
+      }
+    } else {
+      // Save to LocalStorage
+      const newCalc = {
+        id: Date.now(),
+        ...calcData
+      };
+      const updated = [newCalc, ...savedCalcs.slice(0, 9)]; // Keep max 10
+      setSavedCalcs(updated);
+      localStorage.setItem(SAVED_CALCS_KEY, JSON.stringify(updated));
+    }
   };
 
   // Load saved calculation
@@ -184,10 +246,23 @@ const ReconstitutionCalculator = () => {
   };
 
   // Delete saved calculation
-  const deleteCalculation = (id) => {
-    const updated = savedCalcs.filter(c => c.id !== id);
-    setSavedCalcs(updated);
-    localStorage.setItem(SAVED_CALCS_KEY, JSON.stringify(updated));
+  const deleteCalculation = async (id) => {
+    if (user) {
+      // Delete from Supabase
+      const { error } = await supabase
+        .from('user_calculations')
+        .delete()
+        .eq('id', id);
+
+      if (!error) {
+        setSavedCalcs(prev => prev.filter(c => c.id !== id));
+      }
+    } else {
+      // Delete from LocalStorage
+      const updated = savedCalcs.filter(c => c.id !== id);
+      setSavedCalcs(updated);
+      localStorage.setItem(SAVED_CALCS_KEY, JSON.stringify(updated));
+    }
   };
 
   // Reset to defaults
