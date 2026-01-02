@@ -16,12 +16,41 @@ export const useSchedule = () => {
 
     useEffect(() => {
         if (user) {
-            fetchSchedules();
+            fetchSchedules().then((data) => {
+                if (data && device.isNative) {
+                    syncMobileNotifications(data);
+                }
+            });
             fetchTemplates();
         } else {
             loadFromLocalStorage();
         }
     }, [user]);
+
+    // Helper to explicitly sync notification from passed data
+    const syncMobileNotifications = (currentSchedules) => {
+        if (!device.isNative || !currentSchedules || currentSchedules.length === 0) return;
+
+        console.log('Syncing mobile notifications for', currentSchedules.length, 'schedules');
+
+        localNotifications.getPending().then(pending => {
+            const ids = pending.map(n => n.id);
+            if (ids.length > 0) localNotifications.cancel(ids);
+
+            currentSchedules.forEach(schedule => {
+                if (schedule.completed) return;
+                const scheduleDate = new Date(schedule.date);
+                if (scheduleDate > new Date()) {
+                    localNotifications.scheduleInjectionReminder({
+                        id: parseInt(schedule.id.toString().replace(/\D/g, '').slice(-8)) || Math.floor(Math.random() * 100000),
+                        title: 'Time for your dose!',
+                        body: `Take ${schedule.peptide} (${schedule.dosage}${schedule.unit})`,
+                        scheduledAt: scheduleDate
+                    });
+                }
+            });
+        });
+    };
 
     // Schedule notifications whenever schedules change
     useEffect(() => {
@@ -105,9 +134,11 @@ export const useSchedule = () => {
             }));
 
             setSchedules(formattedData);
+            return formattedData;
         } catch (error) {
             console.error('Error fetching schedules:', error);
             loadFromLocalStorage();
+            return [];
         } finally {
             setLoading(false);
         }
