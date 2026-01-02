@@ -17,7 +17,7 @@ const corsHeaders = {
 };
 
 // Configuration
-const REQUEST_TIMEOUT = 15000;
+const REQUEST_TIMEOUT = 25000; // Increased timeout for proxies
 const MAX_RETRIES = 2;
 
 // User Agents to rotate
@@ -77,30 +77,49 @@ const TARGET_PEPTIDES = [
 ];
 
 /**
- * Robust fetch with retries, timeout, and random UA
+ * Robust fetch with retries, timeout, random UA, and Proxy API support
  */
 async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Response> {
     const userAgent = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
-
-    // Simple AbortController for timeout
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
     try {
-        const response = await fetch(url, {
-            headers: {
-                'User-Agent': userAgent,
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.9',
-            },
+        // Support for "Scraping" APIs via env vars
+        const proxyKey = Deno.env.get('SCRAPING_API_KEY');
+        const service = Deno.env.get('SCRAPING_SERVICE_NAME'); // 'zenrows', 'scrapingant'
+
+        let fetchUrl = url;
+        let fetchHeaders: Record<string, string> = {
+            'User-Agent': userAgent,
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': new URL(url).origin,
+            'Cache-Control': 'no-cache',
+        };
+
+        if (proxyKey) {
+            if (service === 'zenrows') {
+                fetchUrl = `https://api.zenrows.com/v1/?apikey=${proxyKey}&url=${encodeURIComponent(url)}&js_render=true&premium_proxy=true`;
+                fetchHeaders = {}; // ZenRows handles this
+            } else if (service === 'scrapingant') {
+                fetchUrl = `https://api.scrapingant.com/v2/general?x-api-key=${proxyKey}&url=${encodeURIComponent(url)}&browser=false`;
+                fetchHeaders = {};
+            }
+        }
+
+        console.log(`Fetching: ${url} ${proxyKey ? `(via ${service || 'Proxy'})` : '(Direct)'}`);
+
+        const response = await fetch(fetchUrl, {
+            headers: fetchHeaders,
             signal: controller.signal
         });
         clearTimeout(id);
 
+        // Handle rate limits or server errors
         if (response.status === 429 || (response.status >= 500 && retries > 0)) {
-            // Exponential backoff
-            const waitTime = 1000 * Math.pow(2, MAX_RETRIES - retries);
-            console.log(`Retrying ${url} in ${waitTime}ms... (Status: ${response.status})`);
+            const waitTime = 2000 * Math.pow(2, MAX_RETRIES - retries);
+            console.log(`Retrying in ${waitTime}ms... (Status: ${response.status})`);
             await new Promise(r => setTimeout(r, waitTime));
             return fetchWithRetry(url, retries - 1);
         }
@@ -110,7 +129,7 @@ async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Respo
         clearTimeout(id);
         const error = err as Error;
         if (retries > 0 && error.name !== 'AbortError') {
-            console.log(`Retrying ${url} due to error: ${error.message}`);
+            console.log(`Retrying due to error: ${error.message}`);
             await new Promise(r => setTimeout(r, 1000));
             return fetchWithRetry(url, retries - 1);
         }
@@ -124,18 +143,12 @@ async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Respo
 function extractPrice(text: string): number | null {
     if (!text) return null;
 
-    // Sometimes price is a range "$50.00 - $100.00", typically take the lower one
-    let cleaned = text.split('-')[0]; // Take first part
-
-    // Remove everything that isn't a digit or dot
-    // However, some currencies use comma as decimal. 
-    // We assume US-centric sites here based on the target vendors.
+    // "From $50.00" -> "50.00"
+    // "$50.00 - $100.00" -> "50.00"
+    let cleaned = text.split('-')[0];
     cleaned = cleaned.replace(/[^0-9.]/g, '');
 
-    // If there are multiple dots, it might be weird formatting or thousands separator?
-    // Usually scraping yields "249.00".
     const price = parseFloat(cleaned);
-
     return isNaN(price) ? null : price;
 }
 
@@ -175,12 +188,10 @@ async function scrapeVendor(vendor: Vendor): Promise<{
 
     try {
         const targetUrl = vendor.scrape_config?.searchUrl || `${vendor.website_url}/peptides`;
-        console.log(`Fetching: ${targetUrl}`);
 
         const response = await fetchWithRetry(targetUrl);
 
         if (!response.ok) {
-            // Throw error to be caught by catch block
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
@@ -200,21 +211,15 @@ async function scrapeVendor(vendor: Vendor): Promise<{
         console.log(`Found ${productElements.length} elements using selector: ${config.productSelector}`);
 
         if (productElements.length === 0) {
-            // Log sample HTML if nothing found (truncated)
-            console.log("No elements found. HTML Preview: ", html.substring(0, 300));
+            console.log("No elements found. HTML Preview (first 200 chars): ", html.substring(0, 200));
         }
 
         for (const node of productElements) {
             try {
-                // Cast to Element to access querySelector
                 const element = node as Element;
-
-                // Name match
-                // Try configured selector, then fallback to looking for any heading
                 let nameEl = element.querySelector(config.nameSelector);
                 let name = nameEl?.textContent?.trim();
 
-                // Fallback: Check for link title or img alt if name empty
                 if (!name) {
                     const link = element.querySelector('a');
                     name = link?.getAttribute('title')?.trim() || link?.textContent?.trim();
@@ -234,7 +239,6 @@ async function scrapeVendor(vendor: Vendor): Promise<{
                 if (price === null || price <= 0) continue;
 
                 // Stock status
-                // Default true, look for negative signals
                 let inStock = true;
                 const outOfStockEl = element.querySelector('.out-of-stock, .soldout, .sold-out, [class*="unavailable"], .stock.out-of-stock');
                 if (outOfStockEl) inStock = false;
@@ -244,9 +248,7 @@ async function scrapeVendor(vendor: Vendor): Promise<{
                     inStock = false;
                 }
 
-                // Push valid product
-                // Deduplicate: if we already have this peptide for this vendor in this scrape run, 
-                // keep the lower price (unlikely case, but possible)
+                // Push valid product (deduplicate logic)
                 const existingIndex = products.findIndex(p => p.name === matchedPeptide.name);
                 if (existingIndex >= 0) {
                     if (products[existingIndex].price > price) {
@@ -259,10 +261,8 @@ async function scrapeVendor(vendor: Vendor): Promise<{
                         inStock,
                     });
                 }
-
-                // console.log(`Found ${matchedPeptide.name}: $${price}`);
             } catch (err) {
-                // Continue despite single product parsing error
+                // Ignore individual product errors
             }
         }
 
@@ -301,8 +301,6 @@ async function updatePrices(
 
         if (!error) {
             updatedCount++;
-
-            // Check for price change to log history
             const { data: currentPrice } = await supabase
                 .from('peptide_prices')
                 .select('id')
@@ -330,7 +328,6 @@ Deno.serve(async (req) => {
         const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        // Optional: Run for specific vendor
         let vendorSlug = null;
         try {
             const body = await req.json();
@@ -353,7 +350,6 @@ Deno.serve(async (req) => {
 
             const count = await updatePrices(supabase, vendor.id, products);
 
-            // Log
             await supabase.from('scrape_logs').insert({
                 vendor_id: vendor.id,
                 status: errors.length ? (products.length > 0 ? 'partial' : 'failed') : 'success',
@@ -367,7 +363,7 @@ Deno.serve(async (req) => {
 
             results.push({ vendor: vendor.name, found: products.length, updated: count, errors });
 
-            // Nice delay between vendors
+            // Delay to avoid bursting
             await new Promise(r => setTimeout(r, 2000));
         }
 
