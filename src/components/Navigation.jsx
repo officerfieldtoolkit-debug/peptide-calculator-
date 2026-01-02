@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Syringe, Calculator, Activity, TrendingDown, BookOpen, User, LogIn, MoreHorizontal, X, MessageCircle } from 'lucide-react';
+import { LayoutDashboard, Syringe, Calculator, Activity, TrendingDown, BookOpen, User, LogIn, MoreHorizontal, X, MessageCircle, Package } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { haptics } from '../services/nativeService';
 import styles from './Navigation.module.css';
@@ -61,6 +61,7 @@ const Navigation = () => {
     { to: '/half-life', icon: Activity, label: 'Decay Plot', ariaLabel: 'Half-Life Plotter' },
     { to: '/guides', icon: BookOpen, label: 'Guides', ariaLabel: 'Peptide Guides' },
     { to: '/price-checker', icon: TrendingDown, label: 'Prices', ariaLabel: 'Price Checker' },
+    { to: '/inventory', icon: Package, label: 'Stock', ariaLabel: 'Peptide Inventory' },
     { to: '/forum', icon: MessageCircle, label: 'Forum', ariaLabel: 'Community Forum' },
   ];
 
