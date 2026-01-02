@@ -3,10 +3,16 @@
 -- Also adds created_at to profiles table
 
 -- ============================================
--- 1. Add created_at to profiles table
+-- 1. Add created_at, last_sign_in, weight_lbs to profiles table (Ensuring columns exist first)
 -- ============================================
 ALTER TABLE public.profiles 
 ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT timezone('utc'::text, now());
+
+ALTER TABLE public.profiles 
+ADD COLUMN IF NOT EXISTS last_sign_in timestamp with time zone;
+
+ALTER TABLE public.profiles 
+ADD COLUMN IF NOT EXISTS weight_lbs numeric;
 
 -- Backfill created_at from updated_at for existing records
 UPDATE public.profiles 
@@ -80,15 +86,6 @@ SELECT
 FROM public.profiles p;
 
 GRANT SELECT ON admin_users_view TO authenticated;
-
--- ============================================
--- 5. Ensure last_sign_in column exists in profiles
--- ============================================
-ALTER TABLE public.profiles 
-ADD COLUMN IF NOT EXISTS last_sign_in timestamp with time zone;
-
-ALTER TABLE public.profiles 
-ADD COLUMN IF NOT EXISTS weight_lbs numeric;
 
 -- ============================================
 -- DONE
