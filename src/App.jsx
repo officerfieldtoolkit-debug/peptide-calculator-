@@ -21,6 +21,7 @@ import AdminPeptides from './pages/admin/AdminPeptides';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminForum from './pages/admin/AdminForum';
 import AdminReviews from './pages/admin/AdminReviews';
+import AdminPrices from './pages/admin/AdminPrices';
 import CookieConsent from './components/CookieConsent';
 import SupportTickets from './components/SupportTickets';
 import AdminTickets from './components/AdminTickets';
@@ -139,6 +140,7 @@ function App() {
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="forum" element={<AdminForum />} />
                 <Route path="reviews" element={<AdminReviews />} />
+                <Route path="prices" element={<AdminPrices />} />
                 <Route path="tickets" element={<AdminTickets />} />
                 <Route path="audit-logs" element={<AdminAuditLogs />} />
                 <Route path="monitoring" element={<AdminMonitoring />} />

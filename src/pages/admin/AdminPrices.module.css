@@ -1,0 +1,581 @@
+.container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.75rem;
+    margin: 0 0 0.5rem;
+}
+
+.header p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.headerActions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.refreshBtn,
+.scrapeBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.refreshBtn {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+}
+
+.refreshBtn:hover:not(:disabled) {
+    background: var(--accent-primary);
+}
+
+.scrapeBtn {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.scrapeBtn:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.scrapeBtn:disabled,
+.refreshBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Messages */
+.successBanner,
+.errorBanner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.successBanner {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #10b981;
+}
+
+.errorBanner {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+/* Stats */
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.statCard {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.75rem;
+}
+
+.statCard svg {
+    color: var(--accent-primary);
+}
+
+.statCard>div {
+    display: flex;
+    flex-direction: column;
+}
+
+.statValue {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.statLabel {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 0.5rem;
+}
+
+.tab {
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    border: none;
+    border-radius: 0.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab:hover {
+    color: var(--text-primary);
+    background: var(--glass-bg);
+}
+
+.tab.active {
+    background: var(--accent-primary);
+    color: white;
+}
+
+/* Loading */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem;
+    color: var(--text-secondary);
+    gap: 1rem;
+}
+
+/* Overview Tab */
+.overview h2 {
+    margin: 0 0 1rem;
+    font-size: 1.25rem;
+}
+
+.priceTable {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.tableHeader,
+.tableRow {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 0.5fr;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    align-items: center;
+}
+
+.tableHeader {
+    background: rgba(0, 0, 0, 0.2);
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.tableRow {
+    border-top: 1px solid var(--glass-border);
+}
+
+.tableRow:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.peptideName {
+    font-weight: 600;
+}
+
+.minPrice {
+    color: #10b981;
+}
+
+.maxPrice {
+    color: #f59e0b;
+}
+
+/* Vendors Tab */
+.vendorList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.vendorCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.75rem;
+}
+
+.vendorInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.vendorLogo {
+    font-size: 2rem;
+}
+
+.vendorInfo h3 {
+    margin: 0 0 0.25rem;
+}
+
+.vendorInfo p {
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.vendorInfo a {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
+.vendorInfo a:hover {
+    color: var(--accent-primary);
+}
+
+.vendorMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.vendorMeta span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.vendorMeta .active {
+    color: #10b981;
+}
+
+.vendorMeta .inactive {
+    color: #ef4444;
+}
+
+.scrapeVendorBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.375rem;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.scrapeVendorBtn:hover:not(:disabled) {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+
+/* All Prices Tab */
+.priceGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.priceCard {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.priceHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.pricePeptide {
+    font-weight: 600;
+}
+
+.priceVendor {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.priceBody {
+    margin-bottom: 0.75rem;
+}
+
+.priceDisplay {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.priceAmount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+}
+
+.priceDisplay button {
+    padding: 0.25rem;
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    border-radius: 0.25rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.priceDisplay button:hover {
+    color: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+
+.editPrice {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.editPrice input {
+    flex: 1;
+    padding: 0.5rem;
+    background: var(--bg-input);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.25rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.editPrice button {
+    padding: 0.5rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.25rem;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.editPrice button:first-of-type:hover {
+    background: #10b981;
+    border-color: #10b981;
+}
+
+.editPrice button:last-of-type:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+}
+
+.priceUnit {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.priceMeta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+}
+
+.inStock {
+    color: #10b981;
+}
+
+.outOfStock {
+    color: #ef4444;
+}
+
+.lastVerified {
+    color: var(--text-muted);
+}
+
+/* Logs Tab */
+.logsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.emptyLogs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem;
+    color: var(--text-secondary);
+    gap: 1rem;
+}
+
+.logItem {
+    padding: 1rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.5rem;
+}
+
+.logItem.success {
+    border-left: 3px solid #10b981;
+}
+
+.logItem.partial {
+    border-left: 3px solid #f59e0b;
+}
+
+.logItem.failed {
+    border-left: 3px solid #ef4444;
+}
+
+.logHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.logVendor {
+    font-weight: 600;
+}
+
+.logStatus {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+}
+
+.logStatus.success {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.logStatus.partial {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.logStatus.failed {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.logDetails {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.logError {
+    font-size: 0.8rem;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.logTime {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .headerActions {
+        width: 100%;
+    }
+
+    .headerActions button {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .statsGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .tableHeader,
+    .tableRow {
+        grid-template-columns: 1fr 1fr;
+        font-size: 0.8rem;
+    }
+
+    .tableHeader span:nth-child(4),
+    .tableHeader span:nth-child(5),
+    .tableRow span:nth-child(4),
+    .tableRow span:nth-child(5) {
+        display: none;
+    }
+
+    .vendorCard {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .tabs {
+        flex-wrap: wrap;
+    }
+
+    .priceGrid {
+        grid-template-columns: 1fr;
+    }
+}

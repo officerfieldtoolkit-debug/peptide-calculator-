@@ -2,34 +2,127 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
     TrendingDown, RefreshCw, DollarSign, ExternalLink, Award,
     AlertCircle, Star, Check, Package, Truck, Shield, Clock,
-    ChevronDown, ChevronUp, Info
+    ChevronDown, ChevronUp, Info, Database
 } from 'lucide-react';
 import styles from './PriceChecker.module.css';
+import { supabase } from '../lib/supabase';
+
+// Fallback data in case database is not populated
 import { VENDORS, PEPTIDE_PRICES, PEPTIDE_CATEGORIES, getVendorPrices } from '../data/vendorData';
 
 const PriceChecker = () => {
-    const [selectedPeptide, setSelectedPeptide] = useState('Semaglutide');
+    const [availablePeptides, setAvailablePeptides] = useState([]);
+    const [selectedPeptide, setSelectedPeptide] = useState('');
     const [prices, setPrices] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [lastUpdate, setLastUpdate] = useState(null);
     const [expandedVendor, setExpandedVendor] = useState(null);
     const [showInfo, setShowInfo] = useState(false);
+    const [useDatabase, setUseDatabase] = useState(true);
+    const [error, setError] = useState(null);
 
-    const loadPrices = () => {
-        setLoading(true);
+    // Fetch available peptides on mount
+    useEffect(() => {
+        fetchAvailablePeptides();
+    }, []);
 
-        // Simulate network delay for better UX
-        setTimeout(() => {
-            const vendorPrices = getVendorPrices(selectedPeptide);
-            setPrices(vendorPrices);
-            setLastUpdate(new Date());
-            setLoading(false);
-        }, 300);
+    // Fetch prices when peptide changes
+    useEffect(() => {
+        if (selectedPeptide) {
+            fetchPrices();
+        }
+    }, [selectedPeptide]);
+
+    const fetchAvailablePeptides = async () => {
+        try {
+            // Try to get peptides from database
+            const { data, error } = await supabase
+                .rpc('get_available_peptides');
+
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+                setAvailablePeptides(data);
+                setSelectedPeptide(data[0].peptide_slug);
+                setUseDatabase(true);
+            } else {
+                // Fall back to static data
+                useFallbackData();
+            }
+        } catch (err) {
+            console.error('Error fetching peptides:', err);
+            useFallbackData();
+        }
     };
 
-    useEffect(() => {
-        loadPrices();
-    }, [selectedPeptide]);
+    const useFallbackData = () => {
+        // Convert static categories to flat list
+        const allPeptides = Object.values(PEPTIDE_CATEGORIES).flat().map(name => ({
+            peptide_name: name,
+            peptide_slug: name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+        }));
+        setAvailablePeptides(allPeptides);
+        setSelectedPeptide('semaglutide');
+        setUseDatabase(false);
+    };
+
+    const fetchPrices = async () => {
+        setLoading(true);
+        setError(null);
+
+        if (useDatabase) {
+            try {
+                const { data, error } = await supabase
+                    .rpc('get_peptide_prices', { p_peptide_slug: selectedPeptide });
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    // Transform database data to match expected format
+                    const formattedPrices = data.map(item => ({
+                        id: item.vendor_slug,
+                        name: item.vendor_name,
+                        logo: item.vendor_logo,
+                        rating: item.vendor_rating,
+                        reviews: item.vendor_reviews,
+                        shipping: item.vendor_shipping,
+                        shippingDays: '2-5 days',
+                        price: parseFloat(item.price),
+                        unit: item.unit || 'vial',
+                        quantity: item.quantity,
+                        inStock: item.in_stock,
+                        productUrl: item.affiliate_url || item.vendor_url,
+                        lastVerified: item.last_verified,
+                        paymentMethods: ['Credit Card', 'Crypto'],
+                        features: ['Lab Tested', 'USA Based'],
+                    }));
+                    setPrices(formattedPrices);
+                    setLastUpdate(new Date());
+                } else {
+                    // No prices in database for this peptide, use fallback
+                    loadFallbackPrices();
+                }
+            } catch (err) {
+                console.error('Error fetching prices:', err);
+                loadFallbackPrices();
+            }
+        } else {
+            loadFallbackPrices();
+        }
+
+        setLoading(false);
+    };
+
+    const loadFallbackPrices = () => {
+        // Find the peptide name from slug
+        const peptide = availablePeptides.find(p => p.peptide_slug === selectedPeptide);
+        const peptideName = peptide?.peptide_name || selectedPeptide;
+
+        // Use static vendor data
+        const vendorPrices = getVendorPrices(peptideName);
+        setPrices(vendorPrices);
+        setLastUpdate(new Date());
+    };
 
     const bestDeal = prices.length > 0 ? prices[0] : null;
     const avgPrice = useMemo(() => {
@@ -37,7 +130,7 @@ const PriceChecker = () => {
         return (prices.reduce((sum, p) => sum + p.price, 0) / prices.length).toFixed(2);
     }, [prices]);
 
-    const peptideInfo = PEPTIDE_PRICES[selectedPeptide];
+    const selectedPeptideInfo = availablePeptides.find(p => p.peptide_slug === selectedPeptide);
 
     const renderStars = (rating) => {
         const fullStars = Math.floor(rating);
@@ -56,6 +149,20 @@ const PriceChecker = () => {
             </div>
         );
     };
+
+    // Group peptides by category for the selector
+    const groupedPeptides = useMemo(() => {
+        if (!useDatabase) {
+            return PEPTIDE_CATEGORIES;
+        }
+        // For database mode, just return a flat "All Peptides" group
+        return {
+            'All Peptides': availablePeptides.map(p => ({
+                name: p.peptide_name,
+                slug: p.peptide_slug
+            }))
+        };
+    }, [availablePeptides, useDatabase]);
 
     return (
         <div className={styles.container}>
@@ -79,13 +186,23 @@ const PriceChecker = () => {
                 </button>
             </div>
 
+            {/* Data Source Indicator */}
+            <div className={styles.dataSource}>
+                <Database size={14} />
+                <span>
+                    {useDatabase
+                        ? 'Prices from database'
+                        : 'Using estimated prices'}
+                </span>
+            </div>
+
             {/* Info Panel */}
             {showInfo && (
                 <div className={styles.infoPanel}>
                     <h4>💡 How Price Comparison Works</h4>
                     <p>
                         We compile pricing data from trusted peptide vendors to help you find the best deals.
-                        Prices are approximate and may vary. Always verify on the vendor's website before purchasing.
+                        Prices are updated periodically and may vary. Always verify on the vendor's website before purchasing.
                     </p>
                     <p>
                         <strong>Affiliate Disclosure:</strong> We may earn a commission when you purchase through our links,
@@ -106,18 +223,29 @@ const PriceChecker = () => {
                         onChange={(e) => setSelectedPeptide(e.target.value)}
                         className={styles.select}
                     >
-                        {Object.entries(PEPTIDE_CATEGORIES).map(([category, peptides]) => (
-                            <optgroup key={category} label={category}>
-                                {peptides.map(peptide => (
-                                    <option key={peptide} value={peptide}>{peptide}</option>
-                                ))}
-                            </optgroup>
-                        ))}
+                        {useDatabase ? (
+                            availablePeptides.map(peptide => (
+                                <option key={peptide.peptide_slug} value={peptide.peptide_slug}>
+                                    {peptide.peptide_name}
+                                    {peptide.min_price && ` ($${peptide.min_price.toFixed(0)} - $${peptide.max_price.toFixed(0)})`}
+                                </option>
+                            ))
+                        ) : (
+                            Object.entries(PEPTIDE_CATEGORIES).map(([category, peptides]) => (
+                                <optgroup key={category} label={category}>
+                                    {peptides.map(peptide => (
+                                        <option key={peptide} value={peptide.toLowerCase().replace(/[^a-z0-9]/g, '-')}>
+                                            {peptide}
+                                        </option>
+                                    ))}
+                                </optgroup>
+                            ))
+                        )}
                     </select>
                 </div>
 
                 <button
-                    onClick={loadPrices}
+                    onClick={fetchPrices}
                     className={`btn-primary ${styles.refreshBtn}`}
                     disabled={loading}
                 >
@@ -127,10 +255,14 @@ const PriceChecker = () => {
             </div>
 
             {/* Selected Peptide Info */}
-            {peptideInfo && (
+            {selectedPeptideInfo && (
                 <div className={styles.peptideInfo}>
-                    <h2>{selectedPeptide}</h2>
-                    <span className={styles.unitBadge}>{peptideInfo.unit}</span>
+                    <h2>{selectedPeptideInfo.peptide_name}</h2>
+                    {selectedPeptideInfo.vendor_count && (
+                        <span className={styles.unitBadge}>
+                            {selectedPeptideInfo.vendor_count} vendors
+                        </span>
+                    )}
                 </div>
             )}
 
@@ -141,7 +273,7 @@ const PriceChecker = () => {
                     <div>
                         <span className={styles.statLabel}>Best Price</span>
                         <span className={styles.statValue}>
-                            {bestDeal ? `$${bestDeal.price}` : '--'}
+                            {bestDeal ? `$${bestDeal.price.toFixed(2)}` : '--'}
                         </span>
                     </div>
                 </div>
@@ -186,7 +318,7 @@ const PriceChecker = () => {
                             </div>
                         </div>
                         <div className={styles.bestDealPrice}>
-                            <span className={styles.priceMain}>${bestDeal.price}</span>
+                            <span className={styles.priceMain}>${bestDeal.price.toFixed(2)}</span>
                             <span className={styles.priceUnit}>per {bestDeal.unit}</span>
                         </div>
                         <div className={styles.bestDealMeta}>
@@ -215,6 +347,11 @@ const PriceChecker = () => {
                         <RefreshCw size={32} className={styles.spinning} />
                         <p>Comparing prices...</p>
                     </div>
+                ) : prices.length === 0 ? (
+                    <div className={styles.emptyState}>
+                        <AlertCircle size={32} />
+                        <p>No prices found for this peptide.</p>
+                    </div>
                 ) : (
                     <div className={styles.vendorList}>
                         {prices.map((vendor, index) => (
@@ -235,13 +372,17 @@ const PriceChecker = () => {
                                             </h3>
                                             <div className={styles.vendorMeta}>
                                                 {renderStars(vendor.rating)}
-                                                <span className={styles.reviewCount}>({vendor.reviews.toLocaleString()} reviews)</span>
+                                                {vendor.reviews && (
+                                                    <span className={styles.reviewCount}>
+                                                        ({vendor.reviews.toLocaleString()} reviews)
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className={styles.vendorPrice}>
-                                        <span className={styles.price}>${vendor.price}</span>
+                                        <span className={styles.price}>${vendor.price.toFixed(2)}</span>
                                         <span className={styles.priceUnit}>/{vendor.unit}</span>
                                     </div>
 
@@ -295,17 +436,21 @@ const PriceChecker = () => {
                                                 <Shield size={16} />
                                                 <div>
                                                     <span className={styles.detailLabel}>Payment</span>
-                                                    <span className={styles.detailValue}>{vendor.paymentMethods.join(', ')}</span>
+                                                    <span className={styles.detailValue}>
+                                                        {vendor.paymentMethods?.join(', ') || 'Credit Card, Crypto'}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className={styles.features}>
-                                            {vendor.features.map((feature, i) => (
-                                                <span key={i} className={styles.featureTag}>
-                                                    <Check size={12} /> {feature}
-                                                </span>
-                                            ))}
-                                        </div>
+                                        {vendor.features && (
+                                            <div className={styles.features}>
+                                                {vendor.features.map((feature, i) => (
+                                                    <span key={i} className={styles.featureTag}>
+                                                        <Check size={12} /> {feature}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
                                         <a
                                             href={vendor.productUrl}
                                             target="_blank"

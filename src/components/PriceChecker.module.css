@@ -98,6 +98,30 @@
   margin-bottom: 0;
 }
 
+/* Data Source Indicator */
+.dataSource {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  color: #3b82f6;
+  margin-bottom: var(--space-lg);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3xl);
+  color: var(--text-secondary);
+  gap: var(--space-md);
+}
+
 /* Controls */
 .controls {
   display: flex;
