@@ -108,12 +108,13 @@ async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Respo
         return response;
     } catch (err) {
         clearTimeout(id);
-        if (retries > 0 && err.name !== 'AbortError') {
-            console.log(`Retrying ${url} due to error: ${err.message}`);
+        const error = err as Error;
+        if (retries > 0 && error.name !== 'AbortError') {
+            console.log(`Retrying ${url} due to error: ${error.message}`);
             await new Promise(r => setTimeout(r, 1000));
             return fetchWithRetry(url, retries - 1);
         }
-        throw err;
+        throw error;
     }
 }
 
@@ -203,8 +204,11 @@ async function scrapeVendor(vendor: Vendor): Promise<{
             console.log("No elements found. HTML Preview: ", html.substring(0, 300));
         }
 
-        for (const element of productElements) {
+        for (const node of productElements) {
             try {
+                // Cast to Element to access querySelector
+                const element = node as Element;
+
                 // Name match
                 // Try configured selector, then fallback to looking for any heading
                 let nameEl = element.querySelector(config.nameSelector);
@@ -263,8 +267,9 @@ async function scrapeVendor(vendor: Vendor): Promise<{
         }
 
     } catch (err) {
-        errors.push(`Failed: ${err.message}`);
-        console.error(`Error scraping ${vendor.name}:`, err);
+        const error = err as Error;
+        errors.push(`Failed: ${error.message}`);
+        console.error(`Error scraping ${vendor.name}:`, error);
     }
 
     return { products, errors };
@@ -298,8 +303,6 @@ async function updatePrices(
             updatedCount++;
 
             // Check for price change to log history
-            // We'll just insert history every successful scrape for now as per "Legit" tracking requirements
-            // Ideally we check if price changed from last history, but that's an optimization.
             const { data: currentPrice } = await supabase
                 .from('peptide_prices')
                 .select('id')
@@ -373,7 +376,8 @@ Deno.serve(async (req) => {
         });
 
     } catch (err) {
-        return new Response(JSON.stringify({ error: err.message }), {
+        const error = err as Error;
+        return new Response(JSON.stringify({ error: error.message }), {
             status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
     }
