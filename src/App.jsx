@@ -39,6 +39,7 @@ const Safety = lazy(() => import('./pages/Safety'));
 const BeginnerGuide = lazy(() => import('./pages/guides/BeginnerGuide'));
 const InjectionGuide = lazy(() => import('./pages/guides/InjectionGuide'));
 const ForumPage = lazy(() => import('./pages/Forum'));
+const Inventory = lazy(() => import('./pages/Inventory'));
 
 import { initAnalytics } from './lib/analytics';
 import { initializeNativeServices } from './services/nativeService';
@@ -116,6 +117,11 @@ function App() {
               <Route path="forum" element={
                 <Suspense fallback={<div style={{ padding: '20px' }}>Loading forum...</div>}>
                   <ForumPage />
+                </Suspense>
+              } />
+              <Route path="inventory" element={
+                <Suspense fallback={<div style={{ padding: '20px' }}>Loading inventory...</div>}>
+                  <Inventory />
                 </Suspense>
               } />
               <Route path="settings" element={
