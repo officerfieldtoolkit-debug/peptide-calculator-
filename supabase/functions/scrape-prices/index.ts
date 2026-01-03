@@ -177,7 +177,7 @@ function findMatchingPeptide(productName: string): { name: string; slug: string 
 }
 
 /**
- * Scrape a vendor's website
+ * Scrape a vendor's website (with pagination support)
  */
 async function scrapeVendor(vendor: Vendor): Promise<{
     products: ScrapedProduct[];
@@ -187,84 +187,132 @@ async function scrapeVendor(vendor: Vendor): Promise<{
     const errors: string[] = [];
 
     try {
-        const targetUrl = vendor.scrape_config?.searchUrl || `${vendor.website_url}/peptides`;
+        const baseUrl = vendor.scrape_config?.searchUrl || `${vendor.website_url}/peptides`;
 
-        const response = await fetchWithRetry(targetUrl);
+        // Maximum pages to scrape (prevent infinite loops)
+        const MAX_PAGES = 5;
+        let currentPage = 1;
+        let hasMorePages = true;
 
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const html = await response.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        if (!doc) throw new Error('Failed to parse HTML');
-
-        // Config validation
-        const config = vendor.scrape_config;
-        if (!config.productSelector || !config.nameSelector || !config.priceSelector) {
-            throw new Error('Missing selector configuration');
-        }
-
-        const productElements = doc.querySelectorAll(config.productSelector);
-        console.log(`Found ${productElements.length} elements using selector: ${config.productSelector}`);
-
-        if (productElements.length === 0) {
-            console.log("No elements found. HTML Preview (first 200 chars): ", html.substring(0, 200));
-        }
-
-        for (const node of productElements) {
-            try {
-                const element = node as Element;
-                let nameEl = element.querySelector(config.nameSelector);
-                let name = nameEl?.textContent?.trim();
-
-                if (!name) {
-                    const link = element.querySelector('a');
-                    name = link?.getAttribute('title')?.trim() || link?.textContent?.trim();
-                }
-
-                if (!name) continue;
-
-                // Peptide Match
-                const matchedPeptide = findMatchingPeptide(name);
-                if (!matchedPeptide) continue;
-
-                // Price extraction
-                const priceEl = element.querySelector(config.priceSelector);
-                const priceText = priceEl?.textContent || '';
-                const price = extractPrice(priceText);
-
-                if (price === null || price <= 0) continue;
-
-                // Stock status
-                let inStock = true;
-                const outOfStockEl = element.querySelector('.out-of-stock, .soldout, .sold-out, [class*="unavailable"], .stock.out-of-stock');
-                if (outOfStockEl) inStock = false;
-
-                if (element.textContent.toLowerCase().includes('out of stock') ||
-                    element.textContent.toLowerCase().includes('sold out')) {
-                    inStock = false;
-                }
-
-                // Push valid product (deduplicate logic)
-                const existingIndex = products.findIndex(p => p.name === matchedPeptide.name);
-                if (existingIndex >= 0) {
-                    if (products[existingIndex].price > price) {
-                        products[existingIndex] = { name: matchedPeptide.name, price, inStock };
-                    }
+        while (hasMorePages && currentPage <= MAX_PAGES) {
+            // Build URL with page parameter
+            let targetUrl = baseUrl;
+            if (currentPage > 1) {
+                // Handle different pagination formats
+                if (baseUrl.includes('?')) {
+                    targetUrl = `${baseUrl}&product-page=${currentPage}`;
                 } else {
-                    products.push({
-                        name: matchedPeptide.name,
-                        price,
-                        inStock,
-                    });
+                    targetUrl = `${baseUrl}?product-page=${currentPage}`;
                 }
-            } catch (err) {
-                // Ignore individual product errors
+            }
+
+            console.log(`Scraping page ${currentPage}: ${targetUrl}`);
+
+            const response = await fetchWithRetry(targetUrl);
+
+            if (!response.ok) {
+                if (currentPage === 1) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                } else {
+                    // Later page failed, stop paginating
+                    break;
+                }
+            }
+
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            if (!doc) {
+                if (currentPage === 1) throw new Error('Failed to parse HTML');
+                break;
+            }
+
+            // Config validation
+            const config = vendor.scrape_config;
+            if (!config.productSelector || !config.nameSelector || !config.priceSelector) {
+                throw new Error('Missing selector configuration');
+            }
+
+            const productElements = doc.querySelectorAll(config.productSelector);
+            console.log(`Page ${currentPage}: Found ${productElements.length} elements`);
+
+            if (productElements.length === 0) {
+                if (currentPage === 1) {
+                    console.log("No elements found. HTML Preview (first 200 chars): ", html.substring(0, 200));
+                }
+                break; // No more products, stop paginating
+            }
+
+            let productsFoundOnPage = 0;
+            for (const node of productElements) {
+                try {
+                    const element = node as Element;
+                    let nameEl = element.querySelector(config.nameSelector);
+                    let name = nameEl?.textContent?.trim();
+
+                    if (!name) {
+                        const link = element.querySelector('a');
+                        name = link?.getAttribute('title')?.trim() || link?.textContent?.trim();
+                    }
+
+                    if (!name) continue;
+
+                    // Peptide Match
+                    const matchedPeptide = findMatchingPeptide(name);
+                    if (!matchedPeptide) continue;
+
+                    // Price extraction
+                    const priceEl = element.querySelector(config.priceSelector);
+                    const priceText = priceEl?.textContent || '';
+                    const price = extractPrice(priceText);
+
+                    if (price === null || price <= 0) continue;
+
+                    // Stock status
+                    let inStock = true;
+                    const outOfStockEl = element.querySelector('.out-of-stock, .soldout, .sold-out, [class*="unavailable"], .stock.out-of-stock');
+                    if (outOfStockEl) inStock = false;
+
+                    if (element.textContent.toLowerCase().includes('out of stock') ||
+                        element.textContent.toLowerCase().includes('sold out')) {
+                        inStock = false;
+                    }
+
+                    // Push valid product (deduplicate logic)
+                    const existingIndex = products.findIndex(p => p.name === matchedPeptide.name);
+                    if (existingIndex >= 0) {
+                        if (products[existingIndex].price > price) {
+                            products[existingIndex] = { name: matchedPeptide.name, price, inStock };
+                        }
+                    } else {
+                        products.push({
+                            name: matchedPeptide.name,
+                            price,
+                            inStock,
+                        });
+                        productsFoundOnPage++;
+                    }
+                } catch (err) {
+                    // Ignore individual product errors
+                }
+            }
+
+            // Check for next page link
+            const nextPageLink = doc.querySelector('a.next, a[rel="next"], .pagination a:last-child, a[aria-label="Next"]');
+            const paginationText = doc.body?.textContent || '';
+
+            // Check if there's indication of more pages
+            if (nextPageLink || paginationText.includes(`page=${currentPage + 1}`) || paginationText.includes(`product-page=${currentPage + 1}`)) {
+                currentPage++;
+                // Small delay between pages
+                await new Promise(r => setTimeout(r, 1500));
+            } else {
+                hasMorePages = false;
             }
         }
+
+        console.log(`Total products found for ${vendor.name}: ${products.length}`);
 
     } catch (err) {
         const error = err as Error;
