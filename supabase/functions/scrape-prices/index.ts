@@ -501,15 +501,30 @@ Deno.serve(async (req) => {
             vendorSlug = body.vendor_slug;
         } catch { }
 
-        let query = supabase.from('vendors').select('*').eq('is_active', true);
-        if (vendorSlug) query = query.eq('slug', vendorSlug);
+        let query = supabase.from('vendors').select('*');
+        // If specific vendor, don't filter by is_active immediately so we can report if it's inactive
+        if (vendorSlug) {
+            query = query.eq('slug', vendorSlug);
+        } else {
+            query = query.eq('is_active', true);
+        }
 
         const { data: vendors, error } = await query;
-        if (error || !vendors?.length) throw new Error('No vendors found');
+        if (error) throw error;
+
+        if (!vendors?.length) throw new Error('No vendors found matching criteria');
+
+        const activeVendors = vendors.filter(v => v.is_active);
+        if (activeVendors.length === 0 && vendorSlug) {
+            throw new Error(`Vendor '${vendorSlug}' is marked as inactive.`);
+        }
+
+        const vendorsToScrape = activeVendors;
+        if (vendorsToScrape.length === 0) throw new Error('No active vendors to scrape');
 
         const results = [];
 
-        for (const vendor of vendors) {
+        for (const vendor of vendorsToScrape) {
             console.log(`--- Scraping ${vendor.name} ---`);
             const start = Date.now();
             const { products, errors } = await scrapeVendor(vendor as Vendor);
