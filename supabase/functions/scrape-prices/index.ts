@@ -17,7 +17,7 @@ const corsHeaders = {
 };
 
 // Configuration
-const REQUEST_TIMEOUT = 60000; // Increased to 60s for proxies
+const REQUEST_TIMEOUT = 120000; // Increased to 120s for slow proxies
 const MAX_RETRIES = 2;
 
 // User Agents to rotate
@@ -310,8 +310,10 @@ async function scrapeVendor(vendor: Vendor): Promise<{
             console.log(`Page ${currentPage}: Found ${productElements.length} elements`);
 
             if (productElements.length === 0) {
-                if (currentPage === 1) {
-                    console.log("No elements found. HTML Preview (first 200 chars): ", html.substring(0, 200));
+                if (products.length === 0 && currentPage === 1) {
+                    const preview = html.substring(0, 500).replace(/[\n\r]+/g, ' ').substring(0, 500);
+                    console.log("No elements found. HTML Preview: ", preview);
+                    errors.push(`No products found on page 1. HTML: ${preview}`);
                 }
                 break; // No more products, stop paginating
             }
