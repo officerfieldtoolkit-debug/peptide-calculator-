@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Syringe, Info, ChevronDown, Bookmark, BookmarkCheck, Trash2, RotateCcw, Beaker, Droplets, FlaskConical, Sparkles } from 'lucide-react';
+import { Syringe, Info, ChevronDown, Bookmark, BookmarkCheck, Trash2, RotateCcw, Beaker, Droplets, FlaskConical, Sparkles, Share2, X, Twitter, Facebook, Link2, Check } from 'lucide-react';
 import styles from './ReconstitutionCalculator.module.css';
 import SyringeVisualizer from './SyringeVisualizer';
 import { supabase } from '../lib/supabase';
@@ -50,6 +50,8 @@ const ReconstitutionCalculator = () => {
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [savedCalcs, setSavedCalcs] = useState([]);
   const [showSaved, setShowSaved] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const autocompleteRef = useRef(null);
 
   // Load saved calculations on mount
@@ -333,6 +335,42 @@ const ReconstitutionCalculator = () => {
     }
   }, [numVialAmount, numWaterAmount, numDoseAmount, user]);
 
+  // Share functionality
+  const shareUrl = 'https://peptidelog.net/calculator';
+  const shareText = 'Check out this free peptide reconstitution calculator - makes dosing so much easier!';
+
+  const handleShare = async (platform) => {
+    const urls = {
+      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      reddit: `https://reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent('Free Peptide Reconstitution Calculator')}`,
+    };
+
+    if (platform === 'copy') {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    } else if (platform === 'native' && navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Peptide Reconstitution Calculator',
+          text: shareText,
+          url: shareUrl
+        });
+        setShowShareModal(false);
+      } catch (err) {
+        // User cancelled or error
+      }
+    } else {
+      window.open(urls[platform], '_blank', 'width=600,height=400');
+      setShowShareModal(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       {/* Signup Prompt for non-logged-in users */}
@@ -355,6 +393,14 @@ const ReconstitutionCalculator = () => {
           >
             <Bookmark size={20} />
             {savedCalcs.length > 0 && <span className={styles.badge}>{savedCalcs.length}</span>}
+          </button>
+          <button
+            className={styles.iconBtn}
+            onClick={() => navigator.share ? handleShare('native') : setShowShareModal(true)}
+            title="Share this calculator"
+            style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}
+          >
+            <Share2 size={20} />
           </button>
           <button className={styles.iconBtn} onClick={resetCalculator} title="Reset">
             <RotateCcw size={20} />
@@ -620,6 +666,140 @@ const ReconstitutionCalculator = () => {
           <strong>Tip:</strong> Add a little extra BAC water for easier dosing.
         </div>
       </div>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            backdropFilter: 'blur(4px)'
+          }}
+          onClick={() => setShowShareModal(false)}
+        >
+          <div
+            style={{
+              background: 'var(--glass-bg)',
+              border: '1px solid var(--glass-border)',
+              borderRadius: '16px',
+              padding: '24px',
+              maxWidth: '360px',
+              width: '90%'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: 0, fontSize: '1.25rem' }}>Share Calculator</h3>
+              <button
+                onClick={() => setShowShareModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '20px', fontSize: '0.9rem' }}>
+              Help others discover this free tool!
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <button
+                onClick={() => handleShare('twitter')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 16px',
+                  background: 'rgba(29, 161, 242, 0.15)',
+                  border: '1px solid rgba(29, 161, 242, 0.3)',
+                  borderRadius: '10px',
+                  color: '#1DA1F2',
+                  cursor: 'pointer',
+                  fontSize: '0.95rem',
+                  fontWeight: '500'
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                Share on X (Twitter)
+              </button>
+
+              <button
+                onClick={() => handleShare('reddit')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 16px',
+                  background: 'rgba(255, 69, 0, 0.15)',
+                  border: '1px solid rgba(255, 69, 0, 0.3)',
+                  borderRadius: '10px',
+                  color: '#FF4500',
+                  cursor: 'pointer',
+                  fontSize: '0.95rem',
+                  fontWeight: '500'
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z" />
+                </svg>
+                Share on Reddit
+              </button>
+
+              <button
+                onClick={() => handleShare('facebook')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 16px',
+                  background: 'rgba(24, 119, 242, 0.15)',
+                  border: '1px solid rgba(24, 119, 242, 0.3)',
+                  borderRadius: '10px',
+                  color: '#1877F2',
+                  cursor: 'pointer',
+                  fontSize: '0.95rem',
+                  fontWeight: '500'
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                </svg>
+                Share on Facebook
+              </button>
+
+              <button
+                onClick={() => handleShare('copy')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 16px',
+                  background: linkCopied ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                  border: linkCopied ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid var(--glass-border)',
+                  borderRadius: '10px',
+                  color: linkCopied ? '#10b981' : 'var(--text-primary)',
+                  cursor: 'pointer',
+                  fontSize: '0.95rem',
+                  fontWeight: '500'
+                }}
+              >
+                {linkCopied ? <Check size={20} /> : <Link2 size={20} />}
+                {linkCopied ? 'Link Copied!' : 'Copy Link'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
