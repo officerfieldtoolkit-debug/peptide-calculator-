@@ -144,7 +144,8 @@ async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Respo
                 fetchHeaders = {}; // ZenRows handles this
             } else if (service === 'scrapingant' || isStubborn) {
                 // Force browser mode for known protected sites
-                fetchUrl = `https://api.scrapingant.com/v2/general?x-api-key=${proxyKey}&url=${encodeURIComponent(url)}&browser=true&wait_for_selector=body`;
+                // Wait for product elements to ensure JS rendering is complete
+                fetchUrl = `https://api.scrapingant.com/v2/general?x-api-key=${proxyKey}&url=${encodeURIComponent(url)}&browser=true&wait_for_selector=.product,.product-item,.product-card`;
                 fetchHeaders = {};
             }
         } else {
