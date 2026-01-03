@@ -145,7 +145,8 @@ async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Respo
             } else if (service === 'scrapingant' || isStubborn) {
                 // Force browser mode for known protected sites
                 // Wait for product elements to ensure JS rendering is complete
-                fetchUrl = `https://api.scrapingant.com/v2/general?x-api-key=${proxyKey}&url=${encodeURIComponent(url)}&browser=true&wait_for_selector=.product,.product-item,.product-card`;
+                // Added li.product for WooCommerce (Swiss Chems)
+                fetchUrl = `https://api.scrapingant.com/v2/general?x-api-key=${proxyKey}&url=${encodeURIComponent(url)}&browser=true&wait_for_selector=.product,.product-item,.product-card,li.product`;
                 fetchHeaders = {};
             }
         } else {
@@ -338,6 +339,16 @@ async function scrapeVendor(vendor: Vendor): Promise<{
                     } else if (lowerHtml.includes('access denied')) {
                         errors.push(`Access Denied (403/406)`);
                     } else {
+                        // Special Handling for Swiss Chems / WooCommerce structure which might be li.product
+                        // Fallback check for alternate selectors if main config failed
+                        const altProducts = doc.querySelectorAll('li.product, .product-item, .product-card');
+                        if (altProducts.length > 0) {
+                            console.log(`Found products using fallback selectors: ${altProducts.length}`);
+                            // Iterate these in the next loop by merging? 
+                            // Easier to just warn for now or auto-switch config effectively
+                            errors.push(`Config mismatch? Found products via fallback selectors but not '${config.productSelector}'`);
+                        }
+
                         // Simple substring to avoid regex crash
                         const preview = html.substring(0, 300);
                         console.log("No elements found. HTML Preview: ", preview);
