@@ -145,8 +145,8 @@ async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Respo
             } else if (service === 'scrapingant' || isStubborn) {
                 // Force browser mode for known protected sites
                 // Wait for product elements to ensure JS rendering is complete
-                // Added li.product for WooCommerce (Swiss Chems)
-                fetchUrl = `https://api.scrapingant.com/v2/general?x-api-key=${proxyKey}&url=${encodeURIComponent(url)}&browser=true&wait_for_selector=.product,.product-item,.product-card,li.product`;
+                // Added li.product (Swiss Chems) and .c-product-card (Peptide Sciences)
+                fetchUrl = `https://api.scrapingant.com/v2/general?x-api-key=${proxyKey}&url=${encodeURIComponent(url)}&browser=true&wait_for_selector=.product,.product-item,.product-card,li.product,.c-product-card`;
                 fetchHeaders = {};
             }
         } else {
