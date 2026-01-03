@@ -17,7 +17,7 @@ const corsHeaders = {
 };
 
 // Configuration
-const REQUEST_TIMEOUT = 25000; // Increased timeout for proxies
+const REQUEST_TIMEOUT = 60000; // Increased to 60s for proxies
 const MAX_RETRIES = 2;
 
 // User Agents to rotate
@@ -443,9 +443,32 @@ async function updatePrices(
 ): Promise<number> {
     let updatedCount = 0;
 
+    // Deduplicate products by target peptide slug before upserting
+    // If multiple products map to the same slug (e.g. 5mg and 10mg versions), 
+    // we keep the one matching our logic (lowest price per mg or lowest price)
+    const uniqueProducts = new Map<string, ScrapedProduct>();
+
     for (const product of products) {
         const peptideSlug = TARGET_PEPTIDES.find(p => p.name === product.name)?.slug;
         if (!peptideSlug) continue;
+
+        if (!uniqueProducts.has(peptideSlug)) {
+            uniqueProducts.set(peptideSlug, product);
+        } else {
+            const existing = uniqueProducts.get(peptideSlug)!;
+            // Compare by price per mg if available
+            if (product.pricePerMg && existing.pricePerMg) {
+                if (product.pricePerMg < existing.pricePerMg) {
+                    uniqueProducts.set(peptideSlug, product);
+                }
+            } else if (product.price < existing.price) {
+                uniqueProducts.set(peptideSlug, product);
+            }
+        }
+    }
+
+    for (const [slug, product] of uniqueProducts.entries()) {
+        const peptideSlug = slug;
 
         // Upsert
         const { error } = await supabase.from('peptide_prices').upsert({
