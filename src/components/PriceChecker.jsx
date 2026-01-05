@@ -319,7 +319,7 @@ const PriceChecker = () => {
                         </div>
                         <div className={styles.bestDealPrice}>
                             <span className={styles.priceMain}>${bestDeal.price.toFixed(2)}</span>
-                            <span className={styles.priceUnit}>per {bestDeal.unit}</span>
+                            <span className={styles.priceUnit}>per {bestDeal.quantity ? `${bestDeal.quantity} ` : ''}{bestDeal.unit}</span>
                         </div>
                         <div className={styles.bestDealMeta}>
                             <span><Truck size={14} /> {bestDeal.shipping}</span>
@@ -383,7 +383,9 @@ const PriceChecker = () => {
 
                                     <div className={styles.vendorPrice}>
                                         <span className={styles.price}>${vendor.price.toFixed(2)}</span>
-                                        <span className={styles.priceUnit}>/{vendor.unit}</span>
+                                        <span className={styles.priceUnit}>
+                                            /{vendor.quantity ? `${vendor.quantity} ` : ''}{vendor.unit}
+                                        </span>
                                     </div>
 
                                     <div className={styles.vendorStatus}>

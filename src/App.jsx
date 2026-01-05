@@ -28,6 +28,8 @@ import AdminTickets from './components/AdminTickets';
 import AdminAuditLogs from './components/AdminAuditLogs';
 import AdminMonitoring from './components/AdminMonitoring';
 import AdminSecurityAudit from './components/AdminSecurityAudit';
+import PromotionalAuthPopup from './components/PromotionalAuthPopup';
+import SEO from './components/SEO';
 
 const Calculator = lazy(() => import('./pages/Calculator'));
 const HalfLife = lazy(() => import('./pages/HalfLife'));
@@ -55,6 +57,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <ThemeProvider>
+          <SEO />
           <Routes>
             <Route path="/" element={
               <ErrorBoundary>
@@ -158,6 +161,7 @@ function App() {
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <PromotionalAuthPopup />
           <CookieConsent />
         </ThemeProvider>
       </AuthProvider>

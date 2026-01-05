@@ -1,228 +1,100 @@
-import React from 'react';
-import { NavLink, useNavigate, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Users, Database, Settings, LogOut, MessageCircle, Activity, Shield, MessageSquare, Star, DollarSign } from 'lucide-react';
+import React, { useState } from 'react';
+import { NavLink, useNavigate, Outlet, useLocation } from 'react-router-dom';
+import {
+    LayoutDashboard, Users, Database, LogOut, MessageCircle,
+    Activity, Shield, MessageSquare, Star, DollarSign, Menu, X
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import styles from './AdminLayout.module.css';
 
 const AdminLayout = () => {
     const { signOut } = useAuth();
     const navigate = useNavigate();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const location = useLocation();
 
     const handleSignOut = async () => {
         await signOut();
         navigate('/login');
     };
 
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+    const closeSidebar = () => setIsSidebarOpen(false);
+
+    // Close sidebar on route change (mobile)
+    React.useEffect(() => {
+        closeSidebar();
+    }, [location.pathname]);
+
+    const navItems = [
+        { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true },
+        { path: '/admin/peptides', icon: Database, label: 'Peptides' },
+        { path: '/admin/users', icon: Users, label: 'Users' },
+        { path: '/admin/forum', icon: MessageSquare, label: 'Forum' },
+        { path: '/admin/reviews', icon: Star, label: 'Reviews' },
+        { path: '/admin/prices', icon: DollarSign, label: 'Prices' },
+        { path: '/admin/tickets', icon: MessageCircle, label: 'Support Tickets' },
+        { path: '/admin/audit-logs', icon: Activity, label: 'Audit Logs' },
+        { path: '/admin/monitoring', icon: Activity, label: 'Monitoring' }, // Icon reused, maybe change later
+        { path: '/admin/security', icon: Shield, label: 'Security Audit' },
+    ];
+
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
+        <div className={styles.container}>
+            {/* Mobile Header */}
+            <div className={styles.mobileHeader}>
+                <button onClick={toggleSidebar} className={styles.menuBtn}>
+                    <Menu size={24} />
+                </button>
+                <div className={styles.headerTitle}>
+                    <h2>Admin Panel</h2>
+                </div>
+                <div style={{ width: 24 }}></div> {/* Spacer for centering */}
+            </div>
+
+            {/* Overlay for mobile */}
+            <div
+                className={`${styles.overlay} ${isSidebarOpen ? styles.open : ''}`}
+                onClick={closeSidebar}
+            />
+
             {/* Sidebar */}
-            <div style={{
-                width: '250px',
-                background: 'rgba(15, 23, 42, 0.8)',
-                borderRight: '1px solid var(--glass-border)',
-                padding: '1.5rem',
-                display: 'flex',
-                flexDirection: 'column'
-            }}>
-                <div style={{ marginBottom: '2rem', paddingLeft: '0.75rem' }}>
-                    <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--accent-primary)' }}>Admin Panel</h2>
+            <div className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ''}`}>
+                <div className={styles.headerTitle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h2>Admin Panel</h2>
+                    <button
+                        onClick={closeSidebar}
+                        className={styles.menuBtn}
+                        style={{ display: window.innerWidth <= 768 ? 'block' : 'none' }}
+                    >
+                        <X size={20} />
+                    </button>
                 </div>
 
-                <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
-                    <NavLink
-                        to="/admin"
-                        end
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '0.75rem',
-                            borderRadius: '0.5rem',
-                            color: isActive ? 'white' : 'var(--text-secondary)',
-                            background: isActive ? 'var(--accent-primary)' : 'transparent',
-                            textDecoration: 'none',
-                            transition: 'all 0.2s'
-                        })}
-                    >
-                        <LayoutDashboard size={20} />
-                        Dashboard
-                    </NavLink>
-                    <NavLink
-                        to="/admin/peptides"
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '0.75rem',
-                            borderRadius: '0.5rem',
-                            color: isActive ? 'white' : 'var(--text-secondary)',
-                            background: isActive ? 'var(--accent-primary)' : 'transparent',
-                            textDecoration: 'none',
-                            transition: 'all 0.2s'
-                        })}
-                    >
-                        <Database size={20} />
-                        Peptides
-                    </NavLink>
-                    <NavLink
-                        to="/admin/users"
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '0.75rem',
-                            borderRadius: '0.5rem',
-                            color: isActive ? 'white' : 'var(--text-secondary)',
-                            background: isActive ? 'var(--accent-primary)' : 'transparent',
-                            textDecoration: 'none',
-                            transition: 'all 0.2s'
-                        })}
-                    >
-                        <Users size={20} />
-                        Users
-                    </NavLink>
-                    <NavLink
-                        to="/admin/forum"
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '0.75rem',
-                            borderRadius: '0.5rem',
-                            color: isActive ? 'white' : 'var(--text-secondary)',
-                            background: isActive ? 'var(--accent-primary)' : 'transparent',
-                            textDecoration: 'none',
-                            transition: 'all 0.2s'
-                        })}
-                    >
-                        <MessageSquare size={20} />
-                        Forum
-                    </NavLink>
-                    <NavLink
-                        to="/admin/reviews"
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '0.75rem',
-                            borderRadius: '0.5rem',
-                            color: isActive ? 'white' : 'var(--text-secondary)',
-                            background: isActive ? 'var(--accent-primary)' : 'transparent',
-                            textDecoration: 'none',
-                            transition: 'all 0.2s'
-                        })}
-                    >
-                        <Star size={20} />
-                        Reviews
-                    </NavLink>
-                    <NavLink
-                        to="/admin/prices"
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '0.75rem',
-                            borderRadius: '0.5rem',
-                            color: isActive ? 'white' : 'var(--text-secondary)',
-                            background: isActive ? 'var(--accent-primary)' : 'transparent',
-                            textDecoration: 'none',
-                            transition: 'all 0.2s'
-                        })}
-                    >
-                        <DollarSign size={20} />
-                        Prices
-                    </NavLink>
-                    <NavLink
-                        to="/admin/tickets"
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '0.75rem',
-                            borderRadius: '0.5rem',
-                            color: isActive ? 'white' : 'var(--text-secondary)',
-                            background: isActive ? 'var(--accent-primary)' : 'transparent',
-                            textDecoration: 'none',
-                            transition: 'all 0.2s'
-                        })}
-                    >
-                        <MessageCircle size={20} />
-                        Support Tickets
-                    </NavLink>
-                    <NavLink
-                        to="/admin/audit-logs"
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '0.75rem',
-                            borderRadius: '0.5rem',
-                            color: isActive ? 'white' : 'var(--text-secondary)',
-                            background: isActive ? 'var(--accent-primary)' : 'transparent',
-                            textDecoration: 'none',
-                            transition: 'all 0.2s'
-                        })}
-                    >
-                        <Activity size={20} />
-                        Audit Logs
-                    </NavLink>
-                    <NavLink
-                        to="/admin/monitoring"
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '0.75rem',
-                            borderRadius: '0.5rem',
-                            color: isActive ? 'white' : 'var(--text-secondary)',
-                            background: isActive ? 'var(--accent-primary)' : 'transparent',
-                            textDecoration: 'none',
-                            transition: 'all 0.2s'
-                        })}
-                    >
-                        <Activity size={20} />
-                        Monitoring
-                    </NavLink>
-                    <NavLink
-                        to="/admin/security"
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '0.75rem',
-                            borderRadius: '0.5rem',
-                            color: isActive ? 'white' : 'var(--text-secondary)',
-                            background: isActive ? 'var(--accent-primary)' : 'transparent',
-                            textDecoration: 'none',
-                            transition: 'all 0.2s'
-                        })}
-                    >
-                        <Shield size={20} />
-                        Security Audit
-                    </NavLink>
+                <nav className={styles.nav}>
+                    {navItems.map((item) => (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            end={item.end}
+                            className={({ isActive }) =>
+                                `${styles.navLink} ${isActive ? styles.activeNavLink : ''}`
+                            }
+                        >
+                            <item.icon size={20} />
+                            {item.label}
+                        </NavLink>
+                    ))}
                 </nav>
 
-                <button
-                    onClick={handleSignOut}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
-                        padding: '0.75rem',
-                        borderRadius: '0.5rem',
-                        color: '#ef4444',
-                        background: 'rgba(239, 68, 68, 0.1)',
-                        border: 'none',
-                        cursor: 'pointer',
-                        marginTop: 'auto'
-                    }}
-                >
+                <button onClick={handleSignOut} className={styles.signOutBtn}>
                     <LogOut size={20} />
                     Sign Out
                 </button>
             </div>
 
             {/* Main Content */}
-            <div style={{ flex: 1, overflow: 'auto' }}>
+            <div className={styles.mainContent}>
                 <Outlet />
             </div>
         </div>

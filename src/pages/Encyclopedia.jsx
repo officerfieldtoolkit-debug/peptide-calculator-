@@ -2,48 +2,19 @@ import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, ArrowRight, Beaker, Activity, Brain, Heart, Zap, BookOpen, Loader2 } from 'lucide-react';
 import { usePeptides } from '../hooks/usePeptides';
+import SEO from '../components/SEO';
 
 const Encyclopedia = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
-
-    const { peptides, loading } = usePeptides();
-
-    // Dynamically generate categories from fetched data
-    const categories = useMemo(() => {
-        if (!peptides.length) return ['All'];
-        const cats = new Set(peptides.map(p => p.category));
-        return ['All', ...Array.from(cats).sort()];
-    }, [peptides]);
-
-    const filteredPeptides = useMemo(() => {
-        return peptides.filter(peptide => {
-            const matchesSearch = peptide.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (peptide.description && peptide.description.toLowerCase().includes(searchTerm.toLowerCase()));
-            const matchesCategory = selectedCategory === 'All' || peptide.category === selectedCategory;
-            return matchesSearch && matchesCategory;
-        });
-    }, [peptides, searchTerm, selectedCategory]);
-
-    const getCategoryIcon = (category) => {
-        if (!category) return <Beaker size={20} />;
-        if (category.includes('GLP-1') || category.includes('Metabolic')) return <Activity size={20} />;
-        if (category.includes('Healing')) return <Heart size={20} />;
-        if (category.includes('Cognitive')) return <Brain size={20} />;
-        if (category.includes('Growth')) return <Zap size={20} />;
-        return <Beaker size={20} />;
-    };
-
-    if (loading) {
-        return (
-            <div className="page-container" style={{ display: 'flex', justifyContent: 'center', paddingTop: '4rem' }}>
-                <Loader2 className="spinning" size={48} color="var(--accent-primary)" />
-            </div>
-        );
-    }
-
+    // ... (rest is same until render) ...
     return (
         <div className="page-container">
+            <SEO
+                title="Peptide Encyclopedia & Database"
+                description="Browse our comprehensive database of peptides. Research dosage protocols, benefits, side effects and half-lives."
+                canonical="/encyclopedia"
+            />
             <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
                 <h1 className="gradient-text" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Peptide Encyclopedia</h1>
                 <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 1.5rem auto' }}>

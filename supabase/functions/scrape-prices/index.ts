@@ -1,5 +1,3 @@
-// Setup type definitions for built-in Supabase environment variables
-/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 /**
  * Supabase Edge Function: scrape-prices
@@ -8,10 +6,11 @@
  * 'Legit' version: robust error handling, UA rotation, better parsing.
  */
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { DOMParser, Element } from 'https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts';
 
 const corsHeaders = {
+
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
@@ -31,7 +30,7 @@ const USER_AGENTS = [
 ];
 
 // Temporarily disabled vendors (conserve API calls)
-const EXCLUDED_VENDORS = ['pure-rawz'];
+const EXCLUDED_VENDORS: string[] = [];
 
 interface Vendor {
     id: string;
@@ -136,7 +135,7 @@ async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Respo
 
         if (proxyKey) {
             // Force ScrapingAnt for stubborn vendors
-            const stubbornDomains = ['swisschems.is', 'peptidesciences.com', 'biotechpeptides.com'];
+            const stubbornDomains = ['swisschems.is', 'biotechpeptides.com', 'corepeptides.com', 'skyepeptides.com'];
             const isStubborn = stubbornDomains.some(d => url.includes(d));
 
             if (service === 'zenrows' && !isStubborn) {
@@ -211,28 +210,22 @@ function extractQuantity(productName: string): { quantity: number | null; unit: 
 
     const text = productName.toLowerCase();
 
-    // Match patterns like "5mg", "10 mg", "5000mcg", "10iu", "20ml"
-    const patterns = [
-        /([\d.]+)\s*mg\b/i,
-        /([\d.]+)\s*mcg\b/i,
-        /([\d.]+)\s*iu\b/i,
-        /([\d.]+)\s*ml\b/i,
-    ];
+    // Match patterns like "5mg", "10 mg", "5-mg", "5000mcg", "10iu", "20ml"
+    // Use a single regex with capturing group for unit to handle variations like "5-mg"
+    const pattern = /([\d.]+)(?:[\s-]*)(mg|mcg|iu|ml)\b/i;
 
-    for (const pattern of patterns) {
-        const match = text.match(pattern);
-        if (match) {
-            let quantity = parseFloat(match[1]);
-            let unit = match[0].replace(/[\d.\s]/g, '').toLowerCase();
+    const match = text.match(pattern);
+    if (match) {
+        let quantity = parseFloat(match[1]);
+        let unit = match[2].toLowerCase();
 
-            // Convert mcg to mg
-            if (unit === 'mcg') {
-                quantity = quantity / 1000;
-                unit = 'mg';
-            }
-
-            return { quantity, unit };
+        // Convert mcg to mg
+        if (unit === 'mcg') {
+            quantity = quantity / 1000;
+            unit = 'mg';
         }
+
+        return { quantity, unit };
     }
 
     return { quantity: null, unit: null };
@@ -399,6 +392,9 @@ async function scrapeVendor(vendor: Vendor): Promise<{
                     // Extract quantity from product name
                     const { quantity, unit } = extractQuantity(name);
 
+                    // DEBUG: Log extracted quantity to help troubleshoot
+                    console.log(`Parsed Quantity: "${name}" -> ${quantity} ${unit}`);
+
                     // Calculate price per mg for comparison
                     let pricePerMg: number | undefined;
                     if (quantity && quantity > 0 && unit === 'mg') {
@@ -479,7 +475,7 @@ async function scrapeVendor(vendor: Vendor): Promise<{
 }
 
 async function updatePrices(
-    supabase: ReturnType<typeof createClient>,
+    supabase: SupabaseClient,
     vendorId: string,
     products: ScrapedProduct[]
 ): Promise<number> {
@@ -551,7 +547,7 @@ async function updatePrices(
     return updatedCount;
 }
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
     if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
     const startTime = Date.now();

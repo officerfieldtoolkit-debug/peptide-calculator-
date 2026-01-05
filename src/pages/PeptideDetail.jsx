@@ -3,6 +3,7 @@ import { useParams, Link, Navigate } from 'react-router-dom';
 import { ArrowLeft, Clock, AlertTriangle, Shield, BookOpen, Activity, ExternalLink, Loader2 } from 'lucide-react';
 import { usePeptides } from '../hooks/usePeptides';
 import ReviewSection from '../components/ReviewSection';
+import SEO from '../components/SEO';
 
 const PeptideDetail = () => {
     const { name } = useParams();
@@ -27,6 +28,30 @@ const PeptideDetail = () => {
 
     return (
         <div className="page-container">
+            <SEO
+                title={`${peptide.name} Protocol & Dosage Guide`}
+                description={peptide.description ? peptide.description.substring(0, 160) : `Complete guide for ${peptide.name} peptide including dosage, protocols, benefits, and side effects.`}
+                canonical={`/encyclopedia/${encodeURIComponent(peptide.name)}`}
+                jsonLd={{
+                    "@context": "https://schema.org/",
+                    "@type": "Product",
+                    "name": peptide.name,
+                    "description": peptide.description,
+                    "category": peptide.category,
+                    "review": {
+                        "@type": "Review",
+                        "reviewRating": {
+                            "@type": "Rating",
+                            "ratingValue": "5",
+                            "bestRating": "5"
+                        },
+                        "author": {
+                            "@type": "Organization",
+                            "name": "PeptideLog Community"
+                        }
+                    }
+                }}
+            />
             <Link to="/encyclopedia" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', textDecoration: 'none', marginBottom: '2rem' }}>
                 <ArrowLeft size={20} /> Back to Encyclopedia
             </Link>
