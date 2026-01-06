@@ -1,591 +1,488 @@
-# Premium Features for Peptide Tracker
+# 💎 PeptideLog Premium Features Roadmap
 
-## 🎯 Overview
-This document outlines premium features that could elevate the Peptide Tracker from a great tool to an **industry-leading platform**. Features are organized by category and include implementation complexity ratings.
+> **Last Updated:** January 5, 2026  
+> **Version:** 2.0  
+> **Status:** Planning Phase (Ready for Implementation)  
+> **Stripe Integration:** ✅ Ready (not yet activated)
+
+This document outlines the planned premium features for PeptideLog, with specific implementation details tied to the existing codebase.
 
 ---
 
-## 💎 Tier 1: Essential Premium Features
+## 📊 Subscription Tiers Overview
 
-### 1. **Cloud Sync & Multi-Device Access** ⭐⭐⭐
-**What:** Sync injection logs, schedules, and settings across all devices
-**Why:** Users want to access their data from phone, tablet, and desktop
+| Tier | Monthly | Annual (20% off) | Target User |
+|------|---------|------------------|-------------|
+| **Free** | $0 | $0 | Casual users, newcomers |
+| **Premium** | $9.99 | $95.88 | Serious enthusiasts |
+| **Pro** | $19.99 | $191.88 | Coaches, practitioners, power users |
+
+---
+
+## 🔧 Current Implementation Status
+
+### Existing Infrastructure
+- ✅ `paymentService.js` - Tier definitions, subscription checking
+- ✅ `SUBSCRIPTION_TIERS` - Defined with limits
+- ✅ Stripe account configured
+- ✅ Supabase database ready
+- ⏳ Checkout flow - Placeholder (ready for Stripe)
+- ⏳ Feature gating - Not yet implemented
+
+### Database Columns Needed
+```sql
+-- Add to profiles table (may already exist)
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS subscription_tier TEXT DEFAULT 'free';
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMPTZ;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;
+```
+
+---
+
+## 🆓 Free Tier Features
+
+Available to all users without a subscription:
+
+| Feature | Limit | File |
+|---------|-------|------|
+| Injection tracking | 50 total | `useInjections.js` |
+| Schedules | 5 active | `useSchedule.js` |
+| Saved calculations | 10 total | `ReconstitutionCalculator.jsx` |
+| Peptide encyclopedia | Read-only | `PeptideEncyclopedia.jsx` |
+| Community reviews | Read-only | `ReviewSection.jsx` |
+| Price checker | Current prices | `PriceChecker.jsx` |
+| History view | 30 days | `InjectionLog.jsx` |
+| Half-life plotter | Basic | `HalfLifePlotter.jsx` |
+
+---
+
+## ⭐ Premium Tier ($9.99/month)
+
+### 1. Unlimited Tracking
+**Priority:** 🔴 HIGH | **Effort:** ⬇️ LOW | **Status:** Ready to implement
+
+Remove all usage limits:
+- ✅ Unlimited injection logs
+- ✅ Unlimited schedules  
+- ✅ Unlimited saved calculations
+
 **Implementation:**
-- Backend database (Firebase, Supabase, or custom)
-- User authentication
-- Real-time sync
-- Offline mode with sync when online
+```javascript
+// In useInjections.js - add before adding injection
+const { tier } = await paymentService.getSubscriptionStatus(userId);
+if (tier === 'free' && injections.length >= 50) {
+    throw new Error('LIMIT_REACHED');
+}
+```
 
-**Complexity:** Medium
-**Value:** Very High
-**Monetization:** Subscription feature ($4.99/month)
-
----
-
-### 2. **Advanced Analytics Dashboard** 📊
-**What:** Comprehensive insights into peptide usage patterns
-**Features:**
-- Weekly/monthly usage trends
-- Cost analysis (spending over time)
-- Effectiveness tracking (weight loss, recovery metrics)
-- Side effect logging and correlation
-- Before/after photo timeline
-- Body composition tracking integration
-- Custom metrics (energy levels, sleep quality, etc.)
-
-**Complexity:** Medium-High
-**Value:** Very High
-**Monetization:** Premium tier feature
+**Files to modify:**
+- `src/hooks/useInjections.js` - Add limit check in `addInjection`
+- `src/hooks/useSchedule.js` - Add limit check in `addSchedule`
+- `src/components/ReconstitutionCalculator.jsx` - Add limit check for saved calcs
 
 ---
 
-### 3. **Smart Reminders & Notifications** 🔔
-**What:** Intelligent notification system
-**Features:**
-- Injection reminders based on schedule
-- Refrigeration alerts (time out of fridge)
-- Expiration warnings for reconstituted peptides
-- Reorder reminders based on usage patterns
-- Dosage escalation notifications
-- Custom reminder rules
+### 2. Data Export
+**Priority:** 🔴 HIGH | **Effort:** ⬇️ LOW | **Status:** Services exist
 
-**Complexity:** Low-Medium
-**Value:** High
-**Monetization:** Free basic, premium for advanced rules
+Export functionality to CSV, PDF, and Excel formats.
 
----
+**Current state:**
+- ✅ `exportService.js` - Core export logic exists
+- ✅ `pdfService.js` - PDF generation ready
+- ⏳ UI buttons need paywall gate
 
-### 4. **Peptide Encyclopedia** 📚
-**What:** Comprehensive database of peptide information
-**Features:**
-- Detailed peptide profiles (benefits, side effects, dosing)
-- Research paper links
-- User reviews and experiences
-- Stacking recommendations
-- Contraindications and warnings
-- Video tutorials for reconstitution
-- FAQ for each peptide
+**Implementation:**
+```javascript
+// In Settings.jsx or DataManagement.jsx
+import { paymentService } from '../services/paymentService';
 
-**Complexity:** Medium (content creation intensive)
-**Value:** Very High
-**Monetization:** Free basic info, premium for detailed guides
+const handleExport = async () => {
+    const canExport = await paymentService.canAccessFeature(userId, 'data_export');
+    if (!canExport) {
+        showUpgradeModal('data_export');
+        return;
+    }
+    // ... proceed with export
+};
+```
+
+**Files to modify:**
+- `src/components/DataManagement.jsx` - Gate export buttons
+- `src/pages/Settings.jsx` - Gate export in data section
 
 ---
 
-### 5. **Protocol Templates & Cycles** 📋
-**What:** Pre-built peptide protocols from experts
-**Features:**
-- Weight loss protocols (Semaglutide, Tirzepatide)
-- Muscle building stacks
-- Recovery protocols
-- Anti-aging regimens
-- Custom protocol builder
-- Cycle planning with rest periods
-- Progress tracking per protocol
+### 3. Extended History
+**Priority:** 🟡 MEDIUM | **Effort:** ⬇️ LOW | **Status:** Ready
 
-**Complexity:** Medium
-**Value:** Very High
-**Monetization:** Premium feature or marketplace
+Unlimited history access (free users limited to 30 days).
 
----
+**Implementation:**
+```javascript
+// In useInjections.js
+const fetchInjections = async () => {
+    const { tier } = await paymentService.getSubscriptionStatus(userId);
+    
+    let query = supabase.from('injections').select('*').eq('user_id', userId);
+    
+    if (tier === 'free') {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        query = query.gte('date', thirtyDaysAgo.toISOString());
+    }
+    
+    return query;
+};
+```
 
-## 💼 Tier 2: Professional Features
-
-### 6. **AI-Powered Dosage Optimization** 🤖
-**What:** Machine learning recommendations based on user data
-**Features:**
-- Personalized dosage suggestions
-- Side effect prediction
-- Optimal timing recommendations
-- Stacking compatibility analysis
-- Progress-based adjustments
-- Goal-oriented optimization
-
-**Complexity:** High
-**Value:** Very High
-**Monetization:** Premium AI tier ($9.99/month)
+**Files to modify:**
+- `src/hooks/useInjections.js` - Add date filter for free users
+- `src/components/InjectionLog.jsx` - Show "Unlock history" prompt
 
 ---
 
-### 7. **Telehealth Integration** 👨‍⚕️
-**What:** Connect with peptide-friendly healthcare providers
-**Features:**
-- In-app consultations
-- Prescription management
-- Lab result tracking
-- Doctor recommendations
-- Insurance coordination
-- Secure messaging with providers
+### 4. Write Reviews
+**Priority:** 🟡 MEDIUM | **Effort:** ⬇️ LOW | **Status:** Ready
 
-**Complexity:** Very High (regulatory considerations)
-**Value:** Extremely High
-**Monetization:** Commission on consultations or subscription
+Free users can read reviews; Premium can write.
 
----
+**Implementation:**
+```javascript
+// In ReviewSection.jsx
+const canWriteReviews = await paymentService.canAccessFeature(userId, 'write_reviews');
 
-### 8. **Lab Results Tracker** 🧪
-**What:** Track bloodwork and biomarkers
-**Features:**
-- Upload and store lab results
-- Trend analysis over time
-- Optimal range indicators
-- Correlation with peptide usage
-- Pre/post cycle comparisons
-- Export for doctors
-- Integration with Quest/LabCorp
+{canWriteReviews ? (
+    <ReviewForm onSubmit={handleSubmitReview} />
+) : (
+    <UpgradePrompt feature="write_reviews" />
+)}
+```
 
-**Complexity:** Medium-High
-**Value:** Very High
-**Monetization:** Premium feature
+**Files to modify:**
+- `src/components/ReviewSection.jsx` - Gate the review form
 
 ---
 
-### 9. **Community & Social Features** 👥
-**What:** Connect with other peptide users
-**Features:**
-- Anonymous forums by peptide type
-- Success story sharing
-- Before/after galleries (optional)
-- Q&A with experienced users
-- Direct messaging
-- Group challenges
-- Vendor reviews and ratings
+### 5. Price Drop Alerts
+**Priority:** 🟡 MEDIUM | **Effort:** 🔶 MEDIUM | **Status:** Needs new backend
 
-**Complexity:** High
-**Value:** High
-**Monetization:** Free with ads, premium ad-free
+Get notified when tracked peptide prices drop.
 
----
+**Database additions:**
+```sql
+CREATE TABLE price_alerts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    peptide_name TEXT NOT NULL,
+    target_price DECIMAL,
+    vendor_id UUID REFERENCES vendors(id),
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    last_triggered_at TIMESTAMPTZ
+);
+```
 
-### 10. **Inventory Management System** 📦
-**What:** Track peptide stock and supplies
-**Features:**
-- Current inventory levels
-- Expiration tracking
-- Automatic reorder suggestions
-- Supplier comparison
-- Batch tracking
-- Cost per dose calculation
-- Waste tracking
-- Barcode scanning
+**Backend work:**
+- Supabase Edge Function to check prices against alerts
+- Email/push notification integration
+- UI for managing watchlist
 
-**Complexity:** Medium
-**Value:** High
-**Monetization:** Premium feature
+**Files to create/modify:**
+- `src/components/PriceAlerts.jsx` - New component
+- `src/services/priceAlertService.js` - New service
+- `supabase/functions/check-price-alerts/` - New edge function
 
 ---
 
-## 🚀 Tier 3: Advanced Features
+### 6. Advanced Analytics
+**Priority:** 🔴 HIGH | **Effort:** 🔶 MEDIUM | **Status:** Enhancement needed
 
-### 11. **Wearable Device Integration** ⌚
-**What:** Sync with fitness trackers and smartwatches
-**Features:**
-- Apple Health integration
-- Google Fit sync
-- Oura Ring data
-- Whoop integration
-- Automatic activity tracking
-- Sleep quality correlation
-- Heart rate variability tracking
-- Stress level monitoring
+Enhanced analytics with AI insights and extended charts.
 
-**Complexity:** High
-**Value:** Very High
-**Monetization:** Premium feature
+**Current state:**
+- ✅ `ProgressAnalytics.jsx` - Basic charts exist
+- ⏳ Need advanced charts and insights
 
----
-
-### 12. **Photo Progress Tracker** 📸
-**What:** Visual progress documentation
-**Features:**
-- Standardized photo capture
-- Side-by-side comparisons
-- Time-lapse creation
-- Body part specific tracking
-- AI-powered body composition estimation
-- Privacy controls
-- Progress milestones
-- Shareable transformations
-
-**Complexity:** Medium-High
-**Value:** High
-**Monetization:** Premium feature
-
----
-
-### 13. **Meal & Nutrition Planner** 🍽️
-**What:** Optimize nutrition for peptide protocols
-**Features:**
-- Meal planning by protocol
-- Macro tracking
-- Timing recommendations (fasting windows)
-- Supplement stacking
-- Recipe database
-- Grocery lists
-- Integration with MyFitnessPal
-- Peptide-food interaction warnings
-
-**Complexity:** High
-**Value:** High
-**Monetization:** Premium feature or separate subscription
-
----
-
-### 14. **Vendor Marketplace** 🏪
-**What:** Verified peptide vendor directory
-**Features:**
-- Verified vendor listings
-- Real-time pricing (from Price Checker)
-- User reviews and ratings
-- Lab testing results
-- Discount codes
-- Affiliate links
-- Order tracking
-- Dispute resolution
-
-**Complexity:** Medium
-**Value:** Very High
-**Monetization:** Affiliate commissions, vendor fees
-
----
-
-### 15. **Export & Reporting** 📄
-**What:** Professional reports for doctors/personal records
-**Features:**
-- PDF export of injection logs
-- Charts and graphs
-- Medical-grade reports
-- Insurance documentation
-- Tax deduction tracking
-- Custom date ranges
-- Multiple format support (PDF, CSV, Excel)
-- HIPAA-compliant storage
-
-**Complexity:** Low-Medium
-**Value:** Medium-High
-**Monetization:** Premium feature
-
----
-
-## 🎨 Tier 4: Engagement Features
-
-### 16. **Gamification & Achievements** 🏆
-**What:** Make tracking fun and engaging
-**Features:**
-- Achievement badges
-- Streak tracking
-- Level system
-- Challenges and goals
-- Leaderboards (optional)
-- Reward points
-- Unlockable content
-- Progress milestones
-
-**Complexity:** Medium
-**Value:** Medium
-**Monetization:** Engagement driver for premium
-
----
-
-### 17. **Personalized Insights** 💡
-**What:** Weekly/monthly summaries and insights
-**Features:**
-- Weekly recap emails
-- Monthly progress reports
-- Personalized tips
-- Cost savings alerts
-- Optimization suggestions
-- Milestone celebrations
+**Premium features to add:**
+- Year-over-year comparison
+- Goal tracking with milestones
+- Compliance scoring
 - Trend predictions
-- Comparative analytics
+- Protocol effectiveness ratings
 
-**Complexity:** Medium
-**Value:** High
-**Monetization:** Premium feature
+**Files to modify:**
+- `src/components/ProgressAnalytics.jsx` - Add premium sections
 
 ---
 
-### 18. **Voice Assistant Integration** 🎤
-**What:** Hands-free logging and queries
+### 7. Smart Notifications
+**Priority:** 🟡 MEDIUM | **Effort:** 🔶 MEDIUM | **Status:** Enhancement needed
+
+Custom reminder schedules, SMS, and email notifications.
+
+**Current state:**
+- ✅ `notificationService.js` - Basic push notifications
+- ⏳ SMS/email need third-party integration
+
+**Premium features to add:**
+- Custom reminder times per peptide
+- SMS reminders (Twilio integration)
+- Email reminders (SendGrid/Supabase)
+- Missed dose alerts
+- Inventory low-stock warnings
+
+**Third-party setup:**
+- Twilio account for SMS
+- SendGrid or use Supabase email triggers
+
+**Files to modify:**
+- `src/services/notificationService.js` - Add SMS/email methods
+- `src/pages/Settings.jsx` - Add notification preferences
+
+---
+
+## 🏆 Pro Tier ($19.99/month)
+
+*Includes all Premium features, plus:*
+
+### 8. Multi-Profile Management
+**Priority:** 🔴 HIGH | **Effort:** ⬆️ HIGH | **Status:** Needs major build
+
+Track multiple stacks/protocols or manage clients.
+
+**Database additions:**
+```sql
+CREATE TABLE user_profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    owner_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    type TEXT CHECK (type IN ('personal', 'client')) DEFAULT 'personal',
+    client_email TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Add profile_id to all user data tables
+ALTER TABLE injections ADD COLUMN profile_id UUID REFERENCES user_profiles(id);
+ALTER TABLE schedules ADD COLUMN profile_id UUID REFERENCES user_profiles(id);
+ALTER TABLE inventory ADD COLUMN profile_id UUID REFERENCES user_profiles(id);
+```
+
+**UI changes:**
+- Profile selector in navigation
+- Profile management page
+- All hooks filter by active profile
+
+**Files to create:**
+- `src/components/ProfileSelector.jsx`
+- `src/pages/ProfileManagement.jsx`
+- `src/context/ProfileContext.jsx`
+
+**Files to modify:**
+- All hooks to accept `profileId` parameter
+- `Navigation.jsx` - Add profile selector
+
+---
+
+### 9. API Access
+**Priority:** 🟡 MEDIUM | **Effort:** ⬆️ HIGH | **Status:** Needs backend build
+
+RESTful API for developers and integrations.
+
+**Backend setup:**
+```sql
+CREATE TABLE api_keys (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    key_hash TEXT NOT NULL,
+    name TEXT,
+    last_used_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    expires_at TIMESTAMPTZ
+);
+```
+
+**Edge functions needed:**
+- `supabase/functions/api/` - Main API router
+- Rate limiting (100 requests/hour)
+- API key validation
+
+**Files to create:**
+- `src/pages/ApiSettings.jsx` - API key management
+- `src/services/apiService.js` - Client-side helpers
+
+---
+
+### 10. Coach Dashboard
+**Priority:** 🔴 HIGH | **Effort:** ⬆️ HIGH | **Status:** Major new feature
+
+Manage multiple clients with protocol sharing.
+
 **Features:**
-- "Log injection" voice command
-- Siri/Google Assistant shortcuts
-- Voice-activated reminders
-- Quick stats queries
-- Hands-free calculator
-- Voice notes for side effects
-
-**Complexity:** Medium-High
-**Value:** Medium
-**Monetization:** Premium feature
-
----
-
-### 19. **Dark Mode & Themes** 🎨
-**What:** Customizable appearance
-**Features:**
-- Multiple theme options
-- Custom color schemes
-- Light/dark/auto mode
-- Accessibility options
-- Font size controls
-- High contrast mode
-
-**Complexity:** Low
-**Value:** Medium
-**Monetization:** Free (user retention)
-
----
-
-### 20. **Offline Mode** ✈️
-**What:** Full functionality without internet
-**Features:**
-- Local data storage
-- Offline calculations
-- Background sync
-- Conflict resolution
-- Offline-first architecture
-- Progressive Web App
-
-**Complexity:** Medium
-**Value:** High
-**Monetization:** Free (essential feature)
-
----
-
-## 💰 Monetization Strategies
-
-### Freemium Model
-**Free Tier:**
-- Basic injection tracking
-- Simple calculator
-- Limited peptides (top 10)
-- Basic half-life plotter
-- 30-day history
-
-**Premium Tier ($9.99/month or $79.99/year):**
-- Unlimited peptides
-- Cloud sync
-- Advanced analytics
-- Smart reminders
+- Client list management
+- Real-time compliance monitoring
 - Protocol templates
-- Photo tracking
-- Export reports
-- Priority support
+- White-label PDF reports
+- Bulk messaging
 
-**Pro Tier ($19.99/month or $159.99/year):**
-- Everything in Premium
-- AI dosage optimization
-- Telehealth access
-- Lab result tracking
-- Wearable integration
-- Custom branding (for coaches)
-- API access
+**Database additions:**
+```sql
+CREATE TABLE coach_clients (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    coach_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    client_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    status TEXT CHECK (status IN ('pending', 'active', 'inactive')) DEFAULT 'pending',
+    created_at TIMESTAMPTZ DEFAULT now()
+);
 
----
+CREATE TABLE protocol_templates (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    coach_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    peptides JSONB NOT NULL,
+    is_public BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+```
 
-### Alternative Revenue Streams
-
-1. **Affiliate Commissions**
-   - Peptide vendor referrals (5-10%)
-   - Lab testing services (10-15%)
-   - Supplement companies (5-8%)
-
-2. **Marketplace Fees**
-   - Vendor listing fees ($99-299/month)
-   - Featured placement ($499/month)
-   - Transaction fees (2-3%)
-
-3. **B2B Licensing**
-   - White-label for clinics ($499-999/month)
-   - API access for developers ($99-299/month)
-   - Bulk licenses for coaches ($29/user/month)
-
-4. **One-Time Purchases**
-   - Protocol packs ($9.99-29.99)
-   - Expert consultations ($49-199)
-   - Custom protocol design ($99-299)
-
-5. **Advertising** (Free tier only)
-   - Vendor ads
-   - Supplement ads
-   - Lab testing ads
+**Files to create:**
+- `src/pages/admin/CoachDashboard.jsx`
+- `src/components/ClientList.jsx`
+- `src/components/ProtocolBuilder.jsx`
+- `src/services/coachService.js`
 
 ---
 
-## 🎯 Implementation Priority
+### 11. Research Features
+**Priority:** 🟢 LOW | **Effort:** 🔶 MEDIUM | **Status:** Content-heavy
 
-### Phase 1 (Months 1-3): Foundation
-1. Cloud sync & authentication
-2. Advanced analytics dashboard
-3. Smart reminders
-4. Inventory management
-5. Export & reporting
+Research summaries, interaction checker, clinical trial updates.
 
-### Phase 2 (Months 4-6): Growth
-1. Peptide encyclopedia
-2. Protocol templates
-3. Photo progress tracker
-4. Community features
-5. Vendor marketplace
+**Data sources:**
+- PubMed API (free) for research papers
+- Manual curation for interactions database
+- DrugBank API (paid) for detailed interactions
 
-### Phase 3 (Months 7-9): Premium
-1. AI dosage optimization
-2. Lab results tracker
-3. Wearable integration
-4. Meal planner
-5. Telehealth integration
-
-### Phase 4 (Months 10-12): Polish
-1. Voice assistant
-2. Gamification
-3. Personalized insights
-4. Mobile apps (iOS/Android)
-5. Advanced customization
+**Files to create:**
+- `src/components/ResearchPanel.jsx`
+- `src/components/InteractionChecker.jsx`
+- `src/services/researchService.js`
 
 ---
 
-## 📊 Feature Comparison Matrix
+### 12. Priority Support
+**Priority:** 🟢 LOW | **Effort:** ⬇️ LOW | **Status:** Ready
 
-| Feature | Free | Premium | Pro |
-|---------|------|---------|-----|
-| Injection Tracking | ✓ | ✓ | ✓ |
-| Basic Calculator | ✓ | ✓ | ✓ |
-| Half-Life Plotter | Limited | ✓ | ✓ |
-| Price Checker | ✓ | ✓ | ✓ |
-| Cloud Sync | ✗ | ✓ | ✓ |
-| Advanced Analytics | ✗ | ✓ | ✓ |
-| Smart Reminders | Basic | ✓ | ✓ |
-| Protocol Templates | ✗ | ✓ | ✓ |
-| Photo Tracking | ✗ | ✓ | ✓ |
-| AI Optimization | ✗ | ✗ | ✓ |
-| Telehealth | ✗ | ✗ | ✓ |
-| Lab Tracking | ✗ | ✗ | ✓ |
-| Wearable Sync | ✗ | ✗ | ✓ |
-| API Access | ✗ | ✗ | ✓ |
+Pro users get priority in support queue.
 
----
+**Implementation:**
+```javascript
+// In SupportTickets.jsx
+const createTicket = async (ticket) => {
+    const { tier } = await paymentService.getSubscriptionStatus(userId);
+    const priority = tier === 'pro' ? 'high' : 'normal';
+    
+    await supabase.from('support_tickets').insert({
+        ...ticket,
+        priority
+    });
+};
+```
 
-## 🚀 Quick Wins (Easy to Implement, High Value)
-
-1. **Dark Mode** - 1-2 days, huge user satisfaction
-2. **Export to PDF** - 2-3 days, professional appeal
-3. **Reminder Notifications** - 3-5 days, daily engagement
-4. **Achievement Badges** - 3-5 days, gamification
-5. **Peptide Encyclopedia** - 1-2 weeks, educational value
-6. **Protocol Templates** - 1 week, immediate value
-7. **Inventory Tracker** - 1 week, practical utility
-8. **Photo Comparison** - 1-2 weeks, visual progress
+**Files to modify:**
+- `src/components/SupportTickets.jsx` - Auto-set priority
+- `src/pages/admin/AdminTickets.jsx` - Sort by priority
 
 ---
 
-## 💡 Unique Differentiators
+## 🚀 Future Features (V2+)
 
-### What Makes This Platform Special:
+### Blood Concentration Simulator
+Half-life visualization with stacking overlap.
 
-1. **Peptide-Specific Focus** - Not a generic health tracker
-2. **Reconstitution Calculator** - Unique, practical tool
-3. **Half-Life Visualization** - Educational and useful
-4. **Price Comparison** - Save users money
-5. **Community Knowledge** - Crowdsourced wisdom
-6. **Protocol Templates** - Expert guidance
-7. **AI Optimization** - Personalized recommendations
-8. **Vendor Marketplace** - One-stop shop
+### AI Protocol Assistant
+Natural language queries and personalized recommendations.
 
----
+### Cycle Planning
+Visual timeline builder with PCT scheduling.
 
-## 📈 Success Metrics
+### Health Integrations
+Apple Health, Google Fit, wearable sync.
 
-### User Engagement
-- Daily active users (DAU)
-- Weekly active users (WAU)
-- Average session duration
-- Injection logs per user
-- Feature adoption rates
-
-### Revenue
-- Monthly recurring revenue (MRR)
-- Conversion rate (free to paid)
-- Churn rate
-- Average revenue per user (ARPU)
-- Lifetime value (LTV)
-
-### Growth
-- New user signups
-- Referral rate
-- App store ratings
-- Social media mentions
-- Press coverage
+### Offline Mode
+Full offline functionality with sync.
 
 ---
 
-## 🎓 Educational Content Ideas
+## 📋 Implementation Checklist
 
-1. **Video Tutorials**
-   - How to reconstitute peptides
-   - Proper injection technique
-   - Storage best practices
-   - Reading lab results
+When you're ready to implement premium features:
 
-2. **Blog Posts**
-   - Peptide comparison guides
-   - Protocol breakdowns
-   - Success stories
-   - Research summaries
+### Phase 1: Foundation (1-2 weeks)
+- [ ] Create `useSubscription` hook for easy tier checking
+- [ ] Create `<PremiumGate>` wrapper component
+- [ ] Add `showUpgradeModal()` utility
+- [ ] Build pricing/upgrade page
+- [ ] Connect Stripe Checkout
+- [ ] Set up Stripe webhooks
 
-3. **Webinars**
-   - Expert Q&A sessions
-   - Protocol deep-dives
-   - Safety workshops
-   - Optimization strategies
+### Phase 2: Gate Existing Features (1 week)
+- [ ] Add limit checks to `useInjections.js`
+- [ ] Add limit checks to `useSchedule.js`
+- [ ] Gate export buttons in `DataManagement.jsx`
+- [ ] Gate review form in `ReviewSection.jsx`
+- [ ] Add date filter for free user history
 
-4. **Podcasts**
-   - Interviews with researchers
-   - User success stories
-   - Industry news
-   - Protocol discussions
+### Phase 3: Build Premium Features (2-4 weeks)
+- [ ] Price alerts system
+- [ ] Enhanced analytics
+- [ ] Smart notifications (SMS/email)
 
----
-
-## 🔒 Privacy & Security Features
-
-1. **Data Encryption** - End-to-end encryption
-2. **Anonymous Mode** - Use without personal info
-3. **HIPAA Compliance** - Medical-grade security
-4. **Two-Factor Auth** - Account protection
-5. **Data Export** - User owns their data
-6. **Account Deletion** - Right to be forgotten
-7. **Privacy Controls** - Granular sharing settings
+### Phase 4: Build Pro Features (4-8 weeks)
+- [ ] Multi-profile system
+- [ ] Coach dashboard
+- [ ] API infrastructure
 
 ---
 
-## 🌍 Localization & Global Features
+## 💰 Revenue Projections
 
-1. **Multi-Language Support** - Spanish, French, German, etc.
-2. **Unit Conversion** - Metric/Imperial
-3. **Currency Support** - Multiple currencies in price checker
-4. **Regional Vendors** - Country-specific marketplace
-5. **Time Zones** - Automatic adjustment
-6. **Legal Compliance** - Region-specific regulations
-
----
-
-## 🎯 Target Audiences
-
-### Primary
-- **Biohackers** - Optimization enthusiasts
-- **Fitness Enthusiasts** - Muscle building, recovery
-- **Weight Loss Users** - GLP-1 agonist users
-- **Anti-Aging** - Longevity seekers
-
-### Secondary
-- **Healthcare Providers** - Clinics, doctors
-- **Coaches & Trainers** - Client management
-- **Researchers** - Data collection
-- **Pharmacies** - Patient support
+| Users | Premium (2%) | Pro (0.5%) | Monthly Revenue |
+|-------|--------------|------------|-----------------|
+| 1,000 | 20 × $9.99 | 5 × $19.99 | $300 |
+| 5,000 | 100 × $9.99 | 25 × $19.99 | $1,499 |
+| 10,000 | 200 × $9.99 | 50 × $19.99 | $2,998 |
+| 50,000 | 1,000 × $9.99 | 250 × $19.99 | $14,988 |
+| 100,000 | 2,000 × $9.99 | 500 × $19.99 | $29,975 |
 
 ---
 
-**Last Updated:** November 24, 2025  
-**Version:** 1.0  
-**Status:** Concept & Planning
+## 📁 Related Files
+
+| Purpose | File |
+|---------|------|
+| Payment service | `src/services/paymentService.js` |
+| Supabase client | `src/lib/supabase.js` |
+| Export service | `src/services/exportService.js` |
+| PDF service | `src/services/pdfService.js` |
+| Notifications | `src/services/notificationService.js` |
+| Analytics | `src/components/ProgressAnalytics.jsx` |
+| Price checker | `src/components/PriceChecker.jsx` |
+| Reviews | `src/components/ReviewSection.jsx` |
+| Injection hook | `src/hooks/useInjections.js` |
+| Schedule hook | `src/hooks/useSchedule.js` |
+
+---
+
+## 📝 Notes
+
+- **Beta Access:** Consider free premium during beta to gather feedback
+- **Lifetime Deal:** One-time purchase for early adopters (~$199-299)
+- **Referral Program:** 1 free month per successful referral
+- **Student Discount:** 50% off with `.edu` email verification
+- **Annual Discount:** Standard 20% off (~2 months free)
+
+---
+
+*This roadmap will be updated as features are implemented.*

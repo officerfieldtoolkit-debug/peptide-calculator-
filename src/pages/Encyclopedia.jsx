@@ -3,11 +3,47 @@ import { Link } from 'react-router-dom';
 import { Search, Filter, ArrowRight, Beaker, Activity, Brain, Heart, Zap, BookOpen, Loader2 } from 'lucide-react';
 import { usePeptides } from '../hooks/usePeptides';
 import SEO from '../components/SEO';
+import SocialShare from '../components/SocialShare';
 
 const Encyclopedia = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
-    // ... (rest is same until render) ...
+
+    const { peptides, loading } = usePeptides();
+
+    // Dynamically generate categories from fetched data
+    const categories = useMemo(() => {
+        if (!peptides.length) return ['All'];
+        const cats = new Set(peptides.map(p => p.category));
+        return ['All', ...Array.from(cats).sort()];
+    }, [peptides]);
+
+    const filteredPeptides = useMemo(() => {
+        return peptides.filter(peptide => {
+            const matchesSearch = peptide.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (peptide.description && peptide.description.toLowerCase().includes(searchTerm.toLowerCase()));
+            const matchesCategory = selectedCategory === 'All' || peptide.category === selectedCategory;
+            return matchesSearch && matchesCategory;
+        });
+    }, [peptides, searchTerm, selectedCategory]);
+
+    const getCategoryIcon = (category) => {
+        if (!category) return <Beaker size={20} />;
+        if (category.includes('GLP-1') || category.includes('Metabolic')) return <Activity size={20} />;
+        if (category.includes('Healing')) return <Heart size={20} />;
+        if (category.includes('Cognitive')) return <Brain size={20} />;
+        if (category.includes('Growth')) return <Zap size={20} />;
+        return <Beaker size={20} />;
+    };
+
+    if (loading) {
+        return (
+            <div className="page-container" style={{ display: 'flex', justifyContent: 'center', paddingTop: '4rem' }}>
+                <Loader2 className="spinning" size={48} color="var(--accent-primary)" />
+            </div>
+        );
+    }
+
     return (
         <div className="page-container">
             <SEO
@@ -16,12 +52,19 @@ const Encyclopedia = () => {
                 canonical="/encyclopedia"
             />
             <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+                    <SocialShare
+                        title="Peptide Encyclopedia - PeptideLog"
+                        description="Browse 100+ peptides with detailed protocols, benefits, and dosage information."
+                        hashtags="peptides,biohacking,research"
+                    />
+                </div>
                 <h1 className="gradient-text" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Peptide Encyclopedia</h1>
                 <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 1.5rem auto' }}>
                     Explore our comprehensive database of peptides, protocols, and scientific research.
                 </p>
                 <Link to="/guides" className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
-                    <BookOpen size={18} /> View Safety & Protocol Guides
+                    <BookOpen size={18} />View Safety & Protocol Guides
                 </Link>
             </div>
 

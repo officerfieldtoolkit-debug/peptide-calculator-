@@ -1,0 +1,312 @@
+/* Social Share Component Styles */
+
+.container {
+    position: relative;
+    display: inline-block;
+}
+
+/* Share Button */
+.shareButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-weight: 500;
+}
+
+.shareButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.shareButton:active {
+    transform: translateY(0);
+}
+
+/* Size Variants */
+.sizeSm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+}
+
+.sizeMd {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.sizeLg {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9375rem;
+}
+
+/* Style Variants */
+.variantButton {
+    /* Default button style - no additional modifications needed */
+    display: inline-flex;
+}
+
+.variantIcon {
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+}
+
+.variantIcon span {
+    display: none;
+}
+
+.variantInline {
+    background: transparent;
+    border: none;
+    padding: 0.25rem 0.5rem;
+}
+
+.variantInline:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Success State */
+.successIcon {
+    color: var(--accent-success);
+}
+
+/* Dropdown Menu */
+.dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 280px;
+    background: var(--glass-bg-strong);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 60px rgba(59, 130, 246, 0.1);
+    z-index: 1000;
+    animation: dropdownSlideIn 0.2s ease-out;
+    overflow: hidden;
+}
+
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Dropdown Header */
+.dropdownHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.dropdownHeader span {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+}
+
+.closeButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.closeButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+/* Copy Link Button */
+.copyButton {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: left;
+}
+
+.copyButton:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.copyButton.copied {
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.copyIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(59, 130, 246, 0.15);
+    border-radius: var(--radius-md);
+    color: var(--accent-primary);
+    flex-shrink: 0;
+    transition: all var(--transition-base);
+}
+
+.copied .copyIcon {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-success);
+}
+
+.copyText {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.copyLabel {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+}
+
+.copyUrl {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Divider */
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Social Grid */
+.socialGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    padding: 0.75rem 1rem 1rem;
+}
+
+.socialButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.75rem 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.socialButton:hover {
+    background: var(--social-bg);
+    border-color: var(--social-color);
+    transform: translateY(-2px);
+}
+
+.socialButton:hover .socialIcon {
+    color: var(--social-color);
+    transform: scale(1.1);
+}
+
+.socialIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    transition: all var(--transition-base);
+}
+
+.socialName {
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Light Mode */
+[data-theme="light"] .dropdown {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.15),
+        0 0 60px rgba(59, 130, 246, 0.08);
+}
+
+[data-theme="light"] .dropdownHeader {
+    background: rgba(241, 245, 249, 0.8);
+}
+
+[data-theme="light"] .copyButton:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .socialButton {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="light"] .socialButton:hover {
+    background: var(--social-bg);
+}
+
+[data-theme="light"] .socialIcon {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+/* Responsive - Dropdown on left for small screens */
+@media (max-width: 400px) {
+    .dropdown {
+        right: auto;
+        left: 0;
+        min-width: min(280px, calc(100vw - 2rem));
+    }
+
+    .socialGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

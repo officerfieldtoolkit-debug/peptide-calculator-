@@ -1,6 +1,7 @@
 import React from 'react';
 import { BookOpen, Shield, Activity, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import SocialShare from '../components/SocialShare';
 
 const GuideCard = ({ title, description, icon: Icon, link, color }) => (
     <Link to={link} style={{ textDecoration: 'none' }}>
@@ -33,6 +34,13 @@ const Guides = () => {
     return (
         <div className="page-container">
             <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+                    <SocialShare
+                        title="Peptide Guides - PeptideLog"
+                        description="Expert-curated peptide guides covering protocols, safety, and best practices."
+                        hashtags="peptides,biohacking,healthtips"
+                    />
+                </div>
                 <h1 className="gradient-text" style={{ fontSize: '3rem', marginBottom: '1.5rem' }}>Peptide Guides</h1>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '1.25rem', maxWidth: '600px', margin: '0 auto' }}>
                     Expert-curated resources to help you understand protocols, safety, and best practices.

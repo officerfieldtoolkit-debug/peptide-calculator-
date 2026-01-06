@@ -8,12 +8,15 @@ import {
 } from 'lucide-react';
 import { useInjections } from '../hooks/useInjections';
 import { useAuth } from '../context/AuthContext';
+import { useOnboarding } from '../hooks/useOnboarding';
 import ProgressAnalytics from '../components/ProgressAnalytics';
+import OnboardingWizard from '../components/OnboardingWizard';
 import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
     const { getStats, injections } = useInjections();
     const { user } = useAuth();
+    const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
     const [showAllActions, setShowAllActions] = useState(false);
 
     const stats = useMemo(() => getStats(), [getStats]);
@@ -147,6 +150,14 @@ const Dashboard = () => {
 
     return (
         <div className={styles.container}>
+            {/* Onboarding Wizard for New Users */}
+            {showOnboarding && (
+                <OnboardingWizard
+                    onComplete={completeOnboarding}
+                    onSkip={skipOnboarding}
+                />
+            )}
+
             {/* Welcome Header */}
             <header className={styles.header}>
                 <div className={styles.welcomeSection}>
