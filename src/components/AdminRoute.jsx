@@ -9,47 +9,11 @@ import { Loader, ShieldX } from 'lucide-react';
  * Checks if the current user has is_admin = true in their profile
  */
 const AdminRoute = ({ children }) => {
-    const { user, loading: authLoading } = useAuth();
-    const [isAdmin, setIsAdmin] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const { user, isAdmin, loading } = useAuth();
     const location = useLocation();
 
-    useEffect(() => {
-        const checkAdminStatus = async () => {
-            if (!user) {
-                setIsAdmin(false);
-                setLoading(false);
-                return;
-            }
-
-            try {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('is_admin')
-                    .eq('id', user.id)
-                    .single();
-
-                if (error) {
-                    console.error('Error checking admin status:', error);
-                    setIsAdmin(false);
-                } else {
-                    setIsAdmin(data?.is_admin === true);
-                }
-            } catch (error) {
-                console.error('Error checking admin status:', error);
-                setIsAdmin(false);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (!authLoading) {
-            checkAdminStatus();
-        }
-    }, [user, authLoading]);
-
     // Still loading auth or admin status
-    if (authLoading || loading) {
+    if (loading) {
         return (
             <div style={{
                 display: 'flex',

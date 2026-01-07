@@ -5,38 +5,10 @@ import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 
 const TitrationPlan = () => {
-    const { user } = useAuth();
-    const [isPremium, setIsPremium] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const { user, isPremium, loading } = useAuth();
 
-    useEffect(() => {
-        const checkPremium = async () => {
-            if (!user) {
-                setLoading(false);
-                return;
-            }
-
-            try {
-                // Check if user has premium subscription
-                const { data, error } = await supabase
-                    .from('user_subscriptions')
-                    .select('plan, status, current_period_end')
-                    .eq('user_id', user.id)
-                    .single();
-
-                if (data && data.status === 'active' && ['premium', 'pro'].includes(data.plan)) {
-                    const isValid = !data.current_period_end || new Date(data.current_period_end) > new Date();
-                    setIsPremium(isValid);
-                }
-            } catch (err) {
-                console.log('No subscription found');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        checkPremium();
-    }, [user]);
+    // Optional: add a small local loading state if needed, but authenticating loading is usually enough.
+    // However, since useAuth loads initially, we can just pass isPremium down.
 
     if (loading) {
         return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>;
