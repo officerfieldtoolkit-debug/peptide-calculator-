@@ -84,39 +84,10 @@ export default defineConfig(async ({ mode }) => {
     build: {
       rollupOptions: {
         output: {
-          manualChunks(id) {
-            if (id.includes('node_modules')) {
-              // React core - rarely changes, cache long-term
-              if (id.includes('react-dom') || id.includes('/react/')) {
-                return 'react-vendor';
-              }
-              // React Router - separate from core
-              if (id.includes('react-router')) {
-                return 'router';
-              }
-              // Supabase - auth and database
-              if (id.includes('@supabase')) {
-                return 'supabase';
-              }
-              // Charts - only loaded on pages that need them
-              if (id.includes('chart.js') || id.includes('react-chartjs-2') || id.includes('recharts')) {
-                return 'charts';
-              }
-              // Icons - large library, separate chunk
-              if (id.includes('lucide-react')) {
-                return 'icons';
-              }
-              // Date utilities
-              if (id.includes('date-fns') || id.includes('dayjs') || id.includes('moment')) {
-                return 'date-utils';
-              }
-              // PDF generation
-              if (id.includes('jspdf') || id.includes('pdf')) {
-                return 'pdf';
-              }
-              // Everything else
-              return 'vendor';
-            }
+          manualChunks: {
+            vendor: ['react', 'react-dom', 'react-router-dom', '@supabase/supabase-js'],
+            ui: ['lucide-react', 'recharts', 'chart.js', 'react-chartjs-2'],
+            utils: ['date-fns', 'jspdf', 'jspdf-autotable', 'html2canvas']
           }
         }
       }
