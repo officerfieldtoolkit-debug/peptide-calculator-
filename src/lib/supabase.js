@@ -13,23 +13,45 @@ if (!isConfigured) {
 
 export const supabase = isConfigured
     ? createClient(supabaseUrl, supabaseAnonKey)
-    : {
+    : (() => {
         // Mock client that returns errors but doesn't crash app
-        auth: {
-            getSession: async () => ({ data: { session: null }, error: null }),
-            onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
-            signUp: async () => ({ error: { message: 'Supabase not configured' } }),
-            signInWithPassword: async () => ({ error: { message: 'Supabase not configured' } }),
-            signOut: async () => ({ error: null }),
-        },
-        from: () => ({
-            select: () => ({ data: [], error: { message: 'Supabase not configured' } }),
-            insert: () => ({ data: null, error: { message: 'Supabase not configured' } }),
-            update: () => ({ data: null, error: { message: 'Supabase not configured' } }),
-            delete: () => ({ data: null, error: { message: 'Supabase not configured' } }),
-            eq: function () { return this; },
-            order: function () { return this; },
-            single: () => ({ data: null, error: { message: 'Supabase not configured' } }),
-        })
-    };
+        // Supports method chaining for database queries
+        const createMockBuilder = () => {
+            const builder = {
+                select: () => builder,
+                insert: () => builder,
+                update: () => builder,
+                delete: () => builder,
+                eq: () => builder,
+                neq: () => builder,
+                gt: () => builder,
+                lt: () => builder,
+                gte: () => builder,
+                lte: () => builder,
+                order: () => builder,
+                limit: () => builder,
+                single: () => builder,
+                maybeSingle: () => builder,
+                // The 'then' method makes this thenable, so it can be awaited
+                then: (resolve) => {
+                    resolve({ data: [], error: { message: 'Supabase not configured' } });
+                }
+            };
+            return builder;
+        };
+
+        return {
+            auth: {
+                getSession: async () => ({ data: { session: null }, error: null }),
+                onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
+                signUp: async () => ({ error: { message: 'Supabase not configured' } }),
+                signInWithPassword: async () => ({ error: { message: 'Supabase not configured' } }),
+                signOut: async () => ({ error: null }),
+                resetPasswordForEmail: async () => ({ error: { message: 'Supabase not configured' } }),
+                updateUser: async () => ({ error: { message: 'Supabase not configured' } }),
+                signInWithOAuth: async () => ({ error: { message: 'Supabase not configured' } }),
+            },
+            from: () => createMockBuilder()
+        };
+    })();
 

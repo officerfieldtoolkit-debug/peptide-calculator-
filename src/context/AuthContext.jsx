@@ -11,8 +11,12 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         // Check active sessions and sets the user
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
+        supabase.auth.getSession().then((response) => {
+            if (response && response.data && response.data.session) {
+                setUser(response.data.session.user);
+            } else {
+                setUser(null);
+            }
         }).catch((err) => {
             console.error('Auth session check failed:', err);
             // Default to no user if session check fails
@@ -22,12 +26,16 @@ export const AuthProvider = ({ children }) => {
         });
 
         // Listen for changes on auth state (sign in, sign out, etc.)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
             setLoading(false);
         });
 
-        return () => subscription.unsubscribe();
+        return () => {
+            if (data && data.subscription) {
+                data.subscription.unsubscribe();
+            }
+        };
     }, []);
 
     const signUp = async (email, password, fullName) => {
