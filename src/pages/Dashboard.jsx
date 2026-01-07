@@ -43,16 +43,16 @@ const Dashboard = () => {
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
         const thisWeek = injections.filter(inj =>
-            new Date(inj.injection_date) >= weekAgo
+            new Date(inj.date) >= weekAgo
         ).length;
 
-        const uniquePeptides = new Set(injections.map(inj => inj.peptide_name)).size;
+        const uniquePeptides = new Set(injections.map(inj => inj.peptide)).size;
 
         // Calculate streak (consecutive days with injections)
         let streak = 0;
         const sortedDates = [...new Set(
             injections
-                .map(inj => new Date(inj.injection_date).toDateString())
+                .map(inj => new Date(inj.date).toDateString())
         )].sort((a, b) => new Date(b) - new Date(a));
 
         for (let i = 0; i < sortedDates.length; i++) {
@@ -78,7 +78,7 @@ const Dashboard = () => {
         if (!injections || injections.length === 0) return [];
         return injections.slice(0, 4).map(inj => ({
             ...inj,
-            timeAgo: getTimeAgo(new Date(inj.injection_date))
+            timeAgo: getTimeAgo(new Date(inj.date))
         }));
     }, [injections]);
 
@@ -309,9 +309,9 @@ const Dashboard = () => {
                                         <CheckCircle2 size={16} />
                                     </div>
                                     <div className={styles.activityInfo}>
-                                        <span className={styles.activityTitle}>{activity.peptide_name}</span>
+                                        <span className={styles.activityTitle}>{activity.peptide}</span>
                                         <span className={styles.activityMeta}>
-                                            {activity.dosage_mcg}mcg • {activity.timeAgo}
+                                            {activity.dosage}{activity.unit} • {activity.timeAgo}
                                         </span>
                                     </div>
                                 </div>
@@ -321,7 +321,7 @@ const Dashboard = () => {
                         <div className={styles.emptyState}>
                             <Syringe size={32} className={styles.emptyIcon} />
                             <p>No injections logged yet</p>
-                            <Link to="/tracker" className={styles.emptyAction}>
+                            <Link to="/log" className={styles.emptyAction}>
                                 Log your first injection
                             </Link>
                         </div>
