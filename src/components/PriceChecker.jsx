@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
     TrendingDown, RefreshCw, DollarSign, ExternalLink, Award,
     AlertCircle, Star, Check, Package, Truck, Shield, Clock,
-    ChevronDown, ChevronUp, Info, Database
+    ChevronDown, ChevronUp, Info, Database, Search
 } from 'lucide-react';
 import styles from './PriceChecker.module.css';
 import { supabase } from '../lib/supabase';
@@ -21,6 +21,14 @@ const PriceChecker = () => {
     const [showInfo, setShowInfo] = useState(false);
     const [useDatabase, setUseDatabase] = useState(true);
     const [error, setError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filteredPrices = useMemo(() => {
+        if (!searchQuery) return prices;
+        return prices.filter(price =>
+            price.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [prices, searchQuery]);
 
     // Fetch available peptides on mount
     useEffect(() => {
@@ -348,24 +356,45 @@ const PriceChecker = () => {
 
             {/* All Vendors List */}
             <div className={styles.vendorSection}>
-                <h2 className={styles.sectionTitle}>All Vendors</h2>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <h2 className={styles.sectionTitle} style={{ margin: 0 }}>All Vendors</h2>
+
+                    <div className={styles.searchWrapper} style={{ position: 'relative' }}>
+                        <Search size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+                        <input
+                            type="text"
+                            placeholder="Search vendors..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{
+                                padding: '8px 12px 8px 36px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border-color)',
+                                backgroundColor: 'var(--bg-secondary)',
+                                color: 'var(--text-primary)',
+                                fontSize: '14px',
+                                width: '200px'
+                            }}
+                        />
+                    </div>
+                </div>
 
                 {loading ? (
                     <div className={styles.loadingState}>
                         <RefreshCw size={32} className={styles.spinning} />
                         <p>Comparing prices...</p>
                     </div>
-                ) : prices.length === 0 ? (
+                ) : filteredPrices.length === 0 ? (
                     <div className={styles.emptyState}>
                         <AlertCircle size={32} />
-                        <p>No prices found for this peptide.</p>
+                        <p>{searchQuery ? 'No vendors found matching your search.' : 'No prices found for this peptide.'}</p>
                     </div>
                 ) : (
                     <div className={styles.vendorList}>
-                        {prices.map((vendor, index) => (
+                        {filteredPrices.map((vendor, index) => (
                             <div
                                 key={vendor.id}
-                                className={`${styles.vendorCard} ${index === 0 ? styles.bestVendor : ''}`}
+                                className={`${styles.vendorCard} ${index === 0 && !searchQuery ? styles.bestVendor : ''}`}
                             >
                                 <div
                                     className={styles.vendorMain}
@@ -376,7 +405,7 @@ const PriceChecker = () => {
                                         <div>
                                             <h3 className={styles.vendorName}>
                                                 {vendor.name}
-                                                {index === 0 && <span className={styles.bestTag}>Best Price</span>}
+                                                {index === 0 && !searchQuery && <span className={styles.bestTag}>Best Price</span>}
                                             </h3>
                                             <div className={styles.vendorMeta}>
                                                 {renderStars(vendor.rating)}
