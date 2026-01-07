@@ -50,7 +50,7 @@ const CookieConsent = () => {
                     <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
                         We use cookies to enhance your experience, analyze site traffic, and ensure security.
                         By continuing to use our site, you consent to our use of cookies.
-                        <a href="/privacy" style={{ color: 'var(--accent-primary)', marginLeft: '0.5rem' }}>Learn more</a>
+                        <a href="/privacy" style={{ color: 'var(--accent-primary)', marginLeft: '0.5rem' }}>Read our Privacy Policy</a>
                     </p>
                 </div>
             </div>

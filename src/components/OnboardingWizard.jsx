@@ -247,9 +247,9 @@ const OnboardingWizard = ({ onComplete, onSkip }) => {
                                             <feature.icon size={22} />
                                         </div>
                                         <div className={styles.featureContent}>
-                                            <h4 className={styles.featureTitle}>
+                                            <h3 className={styles.featureTitle}>
                                                 {feature.title}
-                                            </h4>
+                                            </h3>
                                             <p className={styles.featureDescription}>
                                                 {feature.description}
                                             </p>

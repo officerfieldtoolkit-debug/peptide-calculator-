@@ -152,7 +152,7 @@ const Navigation = () => {
             className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
           >
             <BookOpen size={22} />
-            <span className={styles.label}>Library</span>
+            <span className={styles.label}>Encyclopedia</span>
           </NavLink>
 
           {/* Desktop Only - Show secondary nav items directly */}
