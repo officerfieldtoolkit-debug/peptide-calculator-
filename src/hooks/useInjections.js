@@ -226,6 +226,8 @@ export const useInjections = () => {
         let totalActive = 0;
         injections.forEach(inj => {
             const injTime = new Date(inj.date).getTime();
+            if (isNaN(injTime)) return; // Skip invalid dates
+
             const elapsedHours = (now - injTime) / (1000 * 60 * 60);
             // Use 168 hours (7 days) as default half-life for GLP-1 peptides
             const halfLife = 168;

@@ -1,6 +1,7 @@
 /**
  * Accessibility utilities and helpers for WCAG compliance
  */
+import React from 'react';
 
 // Skip to main content link - add to top of page
 export const SkipLink = () => (
@@ -169,5 +170,4 @@ export const hasGoodContrast = (foreground, background, threshold = 4.5) => {
     return ratio >= threshold;
 };
 
-// Import React for hooks
-import React from 'react';
+

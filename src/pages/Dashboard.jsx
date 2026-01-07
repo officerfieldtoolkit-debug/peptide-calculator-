@@ -83,6 +83,7 @@ const Dashboard = () => {
     }, [injections]);
 
     function getTimeAgo(date) {
+        if (!date || isNaN(date.getTime())) return '';
         const seconds = Math.floor((new Date() - date) / 1000);
         if (seconds < 60) return 'Just now';
         if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
@@ -216,7 +217,7 @@ const Dashboard = () => {
                     </div>
                     <div className={styles.statInfo}>
                         <span className={styles.statValue}>
-                            {stats?.lastInjection ?
+                            {stats?.lastInjection && !isNaN(new Date(stats.lastInjection.date).getTime()) ?
                                 new Date(stats.lastInjection.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
                                 : '--'}
                         </span>
