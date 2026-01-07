@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Syringe, Calculator, Activity, TrendingDown, BookOpen, User, LogIn, MoreHorizontal, X, MessageCircle, Package, MapPin, TestTubes, TrendingUp, Star } from 'lucide-react';
+import { LayoutDashboard, Syringe, Calculator, Activity, TrendingDown, BookOpen, User, LogIn, MoreHorizontal, X, MessageCircle, Package, MapPin, TestTubes, TrendingUp, Star, Beaker } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { haptics } from '../services/nativeService';
 import styles from './Navigation.module.css';
