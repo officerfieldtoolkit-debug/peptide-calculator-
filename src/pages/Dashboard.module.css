@@ -516,37 +516,51 @@
 @media (max-width: 768px) {
     .container {
         padding: var(--space-md);
-        padding-bottom: 100px;
+        padding-bottom: 110px;
         /* Space for mobile stats */
     }
 
     .header {
         flex-direction: column;
         align-items: flex-start;
+        gap: var(--space-md);
+    }
+
+    .welcomeSection h1 {
+        font-size: 1.75rem;
     }
 
     .primaryAction {
         width: 100%;
         justify-content: center;
+        padding: 14px;
+        font-size: 1rem;
     }
 
+    /* Stats Grid: Keep 2x2 on mobile for density */
     .statsGrid {
         grid-template-columns: 1fr 1fr;
-        gap: var(--space-md);
+        gap: var(--space-sm);
+        margin-bottom: var(--space-xl);
     }
 
     .statCard {
         padding: var(--space-md);
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        gap: var(--space-sm);
     }
 
     .statIcon {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
+        margin-bottom: 4px;
     }
 
     .statIcon svg {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
     }
 
     .statValue {
@@ -557,31 +571,46 @@
         font-size: 0.75rem;
     }
 
+    /* Actions Grid: Switch to 2 columns for better utilize space */
     .actionsGrid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm);
     }
 
     .actionCard {
         padding: var(--space-md);
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: var(--space-sm);
     }
 
     .actionIcon {
-        width: 40px;
-        height: 40px;
+        width: 42px;
+        height: 42px;
+        margin-bottom: 4px;
     }
 
-    .guestCta {
-        flex-direction: column;
-        text-align: center;
+    .actionTitle {
+        font-size: 0.875rem;
+        margin-bottom: 0;
     }
 
-    .ctaContent {
-        flex-direction: column;
+    .actionDesc {
+        display: none;
+        /* Hide description on mobile to save space */
     }
 
-    .ctaButton {
-        width: 100%;
-        text-align: center;
+    .actionArrow {
+        display: none;
+        /* Hide arrow on mobile */
+    }
+
+    .premiumBadge {
+        top: 6px;
+        right: 6px;
+        padding: 2px 6px;
+        font-size: 0.55rem;
     }
 
     /* Mobile Stats Bar */
@@ -591,13 +620,16 @@
         bottom: 0;
         left: 0;
         right: 0;
-        background: var(--bg-card);
+        background: rgba(15, 23, 42, 0.85);
+        /* Glass dark background */
         border-top: 1px solid var(--glass-border);
-        padding: var(--space-md) var(--space-lg);
-        justify-content: space-around;
+        padding: 12px 24px;
+        justify-content: space-between;
         align-items: center;
         z-index: 100;
-        backdrop-filter: blur(20px);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
     }
 
     .mobileStatItem {
@@ -605,39 +637,61 @@
         flex-direction: column;
         align-items: center;
         gap: 2px;
+        flex: 1;
     }
 
     .mobileStatValue {
-        font-size: 1.25rem;
-        font-weight: 800;
+        font-size: 1.1rem;
+        font-weight: 700;
         color: var(--text-primary);
+        line-height: 1;
     }
 
     .mobileStatLabel {
-        font-size: 0.6875rem;
+        font-size: 0.65rem;
         color: var(--text-secondary);
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        margin-top: 2px;
     }
 
     .mobileStatDivider {
         width: 1px;
-        height: 32px;
-        background: var(--glass-border);
-    }
-
-    .actionText {
-        display: inline;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.1);
     }
 }
 
 /* Small Mobile */
-@media (max-width: 400px) {
+@media (max-width: 380px) {
     .statsGrid {
         grid-template-columns: 1fr;
+        /* Stack stats on tiny screens */
     }
 
     .statCard {
         flex-direction: row;
+        align-items: center;
+    }
+
+    .actionsGrid {
+        grid-template-columns: 1fr;
+        /* Stack actions on tiny screens */
+    }
+
+    .actionCard {
+        flex-direction: row;
+        text-align: left;
+        align-items: center;
+    }
+
+    .actionIcon {
+        margin-bottom: 0;
+    }
+
+    .actionDesc {
+        display: block;
+        /* Show desc again since we have width */
+        font-size: 0.75rem;
     }
 }
