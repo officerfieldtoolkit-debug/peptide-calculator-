@@ -49,7 +49,7 @@ const Navigation = () => {
   };
 
   // Check if any "more" menu item is active
-  const isMoreItemActive = ['/half-life', '/guides', '/price-checker', '/forum', '/injection-sites', '/blood-work', '/titration', '/reviews'].includes(location.pathname);
+  const isMoreItemActive = ['/half-life', '/guides', '/price-checker', '/forum', '/injection-sites', '/blood-work', '/titration', '/reviews', '/stack-builder'].includes(location.pathname);
 
   // Haptic feedback on navigation tap
   const handleNavClick = () => {
@@ -66,6 +66,7 @@ const Navigation = () => {
     { to: '/reviews', icon: Star, label: 'Reviews', ariaLabel: 'Vendor Reviews' },
     { to: '/blood-work', icon: TestTubes, label: 'Blood Work', ariaLabel: 'Blood Work Tracker', premium: true },
     { to: '/titration', icon: TrendingUp, label: 'Titration', ariaLabel: 'Dose Titration Planner', premium: true },
+    { to: '/stack-builder', icon: Beaker, label: 'Stack Builder', ariaLabel: 'Peptide Stack Interaction Checker' },
     { to: '/forum', icon: MessageCircle, label: 'Forum', ariaLabel: 'Community Forum' },
   ];
 

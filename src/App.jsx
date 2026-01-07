@@ -33,6 +33,7 @@ import SEO from './components/SEO';
 import PageLoader from './components/PageLoader';
 
 const Calculator = lazy(() => import('./pages/Calculator'));
+const StackProtocol = lazy(() => import('./pages/StackProtocol'));
 const HalfLife = lazy(() => import('./pages/HalfLife'));
 const PriceChecker = lazy(() => import('./pages/PriceChecker'));
 const Encyclopedia = lazy(() => import('./pages/Encyclopedia'));
@@ -88,6 +89,11 @@ function App() {
               <Route path="half-life" element={
                 <Suspense fallback={<PageLoader type="calculator" />}>
                   <HalfLife />
+                </Suspense>
+              } />
+              <Route path="stack-builder" element={
+                <Suspense fallback={<PageLoader type="calculator" />}>
+                  <StackProtocol />
                 </Suspense>
               } />
               <Route path="login" element={<Login />} />
