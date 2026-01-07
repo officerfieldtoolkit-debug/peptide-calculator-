@@ -182,28 +182,9 @@ const InjectionSiteMap = () => {
                             <circle cx="50" cy="10" r="7" className={styles.bodyOutline} />
 
                             {/* Torso & Limbs Path */}
+                            {/* Torso & Limbs Path */}
                             <path
-                                d="M 45 18 
-                                   L 30 20 
-                                   C 25 22 22 28 22 45 
-                                   L 28 45 
-                                   C 28 35 32 32 34 32 
-                                   L 34 45 
-                                   C 34 50 30 52 30 58 
-                                   L 32 90 
-                                   L 44 90 
-                                   L 46 65 
-                                   L 54 65 
-                                   L 56 90 
-                                   L 68 90 
-                                   L 70 58 
-                                   C 70 52 66 50 66 45 
-                                   L 66 32 
-                                   C 68 32 72 35 72 45 
-                                   L 78 45 
-                                   C 78 28 75 22 70 20 
-                                   L 55 18 
-                                   Q 50 20 45 18 Z"
+                                d="M 45 18 L 30 20 C 25 22 22 28 22 45 L 28 45 C 28 35 32 32 34 32 L 34 45 C 34 50 30 52 30 58 L 32 90 L 44 90 L 46 65 L 54 65 L 56 90 L 68 90 L 70 58 C 70 52 66 50 66 45 L 66 32 C 68 32 72 35 72 45 L 78 45 C 78 28 75 22 70 20 L 55 18 Q 50 20 45 18 Z"
                                 className={styles.bodyOutline}
                             />
                         </g>
