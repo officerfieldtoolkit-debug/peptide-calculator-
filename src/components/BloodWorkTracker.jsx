@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { Plus, TrendingUp, TrendingDown, AlertTriangle, Lock, Calendar, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import styles from './BloodWorkTracker.module.css';
+import UpgradeModal from './UpgradeModal';
 
 // Blood marker definitions with reference ranges
 const bloodMarkers = {
@@ -53,7 +54,34 @@ const bloodMarkers = {
     ],
 };
 
-import UpgradeModal from './UpgradeModal';
+// Premium gate component - extracted to avoid conditional hooks
+const PremiumGate = () => {
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+    return (
+        <div className={styles.premiumGate}>
+            <div className={styles.premiumCard}>
+                <Lock size={48} className={styles.lockIcon} />
+                <h2>Premium Feature</h2>
+                <p>Blood Work Tracker is a premium feature that allows you to:</p>
+                <ul>
+                    <li>Track 50+ blood markers over time</li>
+                    <li>Visualize trends with interactive charts</li>
+                    <li>Get alerts when values are out of range</li>
+                    <li>Export reports for your doctor</li>
+                    <li>Correlate with your peptide protocols</li>
+                </ul>
+                <button
+                    className={styles.upgradeBtn}
+                    onClick={() => setShowUpgradeModal(true)}
+                >
+                    Upgrade to Premium
+                </button>
+            </div>
+            <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+        </div>
+    );
+};
 
 const BloodWorkTracker = ({ isPremium = false }) => {
     const { user } = useAuth();
@@ -63,42 +91,12 @@ const BloodWorkTracker = ({ isPremium = false }) => {
     const [selectedCategory, setSelectedCategory] = useState('hormones');
     const [selectedMarker, setSelectedMarker] = useState(null);
     const [newEntry, setNewEntry] = useState({ date: new Date().toISOString().split('T')[0], values: {} });
-    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
-    // Check if premium feature
-    if (!isPremium) {
-        return (
-            <div className={styles.premiumGate}>
-                <div className={styles.premiumCard}>
-                    <Lock size={48} className={styles.lockIcon} />
-                    <h2>Premium Feature</h2>
-                    <p>Blood Work Tracker is a premium feature that allows you to:</p>
-                    <ul>
-                        <li>Track 50+ blood markers over time</li>
-                        <li>Visualize trends with interactive charts</li>
-                        <li>Get alerts when values are out of range</li>
-                        <li>Export reports for your doctor</li>
-                        <li>Correlate with your peptide protocols</li>
-                    </ul>
-                    <button
-                        className={styles.upgradeBtn}
-                        onClick={() => setShowUpgradeModal(true)}
-                    >
-                        Upgrade to Premium
-                    </button>
-                </div>
-                <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
-            </div>
-        );
-    }
-
-    useEffect(() => {
-        if (user) {
-            fetchEntries();
+    const fetchEntries = useCallback(async () => {
+        if (!user) {
+            setLoading(false);
+            return;
         }
-    }, [user]);
-
-    const fetchEntries = async () => {
         try {
             const { data, error } = await supabase
                 .from('blood_work')
@@ -113,7 +111,20 @@ const BloodWorkTracker = ({ isPremium = false }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user]);
+
+    useEffect(() => {
+        if (isPremium) {
+            fetchEntries();
+        } else {
+            setLoading(false);
+        }
+    }, [isPremium, fetchEntries]);
+
+    // Early return for non-premium users AFTER all hooks
+    if (!isPremium) {
+        return <PremiumGate />;
+    }
 
     const handleAddEntry = async () => {
         try {
@@ -152,6 +163,14 @@ const BloodWorkTracker = ({ isPremium = false }) => {
     };
 
     const markers = bloodMarkers[selectedCategory] || [];
+
+    if (loading) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.loadingState}>Loading blood work data...</div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.container}>
@@ -286,11 +305,11 @@ const BloodWorkTracker = ({ isPremium = false }) => {
                         </div>
 
                         <div className={styles.markersInput}>
-                            {Object.entries(bloodMarkers).map(([category, markers]) => (
+                            {Object.entries(bloodMarkers).map(([category, categoryMarkers]) => (
                                 <div key={category} className={styles.categorySection}>
                                     <h3>{category.charAt(0).toUpperCase() + category.slice(1)}</h3>
                                     <div className={styles.inputGrid}>
-                                        {markers.map(marker => (
+                                        {categoryMarkers.map(marker => (
                                             <div key={marker.id} className={styles.inputItem}>
                                                 <label>{marker.name}</label>
                                                 <div className={styles.inputWithUnit}>

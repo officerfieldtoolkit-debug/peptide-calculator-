@@ -1,12 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import {
     ChevronLeft, ChevronRight, Plus, Trash2, CheckCircle, Circle, Calendar, X,
-    CloudOff, Loader2, Repeat, Clock, Zap, Edit2, CalendarPlus, CalendarCheck,
-    AlertCircle, Bell, BellOff
+    CloudOff, Loader2, Repeat, Clock, Zap, CalendarPlus, CalendarCheck,
+    Bell
 } from 'lucide-react';
 import {
     format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval,
-    isSameMonth, isSameDay, addMonths, subMonths, isToday, addDays, addWeeks
+    isSameMonth, isSameDay, addMonths, subMonths, isToday, addWeeks
 } from 'date-fns';
 import { useSchedule } from '../hooks/useSchedule';
 import { useAuth } from '../context/AuthContext';
@@ -62,18 +62,13 @@ const CalendarScheduler = () => {
 
     // Autocomplete state
     const [showAutocomplete, setShowAutocomplete] = useState(false);
-    const [filteredPeptides, setFilteredPeptides] = useState([]);
-    const [notificationPermission, setNotificationPermission] = useState('default');
+    const [notificationPermission, setNotificationPermission] = useState(() => {
+        // Initialize with current permission status
+        return !device.isNative ? notificationService.getPermission() : 'default';
+    });
     const autocompleteRef = useRef(null);
 
-    useEffect(() => {
-        // Check permission status
-        if (!device.isNative) {
-            setNotificationPermission(notificationService.getPermission());
-        }
-    }, []);
-
-    const requestNotifications = async () => {
+    const requestNotifications = useCallback(async () => {
         const granted = await notificationService.requestPermission();
         setNotificationPermission(granted ? 'granted' : 'denied');
         if (granted) {
@@ -81,20 +76,18 @@ const CalendarScheduler = () => {
             notificationService.scheduleReminders(schedules);
             alert('Notifications enabled! You will be reminded 30 minutes before your scheduled doses.');
         }
-    };
+    }, [schedules]);
 
-    // Filter peptides for autocomplete
-    useEffect(() => {
+    // Filter peptides for autocomplete - use useMemo instead of useEffect + setState
+    const filteredPeptides = useMemo(() => {
         if (formData.peptide) {
             const search = formData.peptide.toLowerCase();
-            const filtered = peptides
+            return peptides
                 .filter(p => p.name.toLowerCase().includes(search))
                 .map(p => p.name)
                 .slice(0, 6);
-            setFilteredPeptides(filtered);
-        } else {
-            setFilteredPeptides(peptides.map(p => p.name).slice(0, 6));
         }
+        return peptides.map(p => p.name).slice(0, 6);
     }, [formData.peptide, peptides]);
 
     // Close autocomplete on click outside
@@ -318,7 +311,6 @@ const CalendarScheduler = () => {
                             {calendarDays.map(day => {
                                 const daySchedules = getSchedulesForDay(day);
                                 const hasSchedules = daySchedules.length > 0;
-                                const completedCount = daySchedules.filter(s => s.completed).length;
                                 const isSelected = isSameDay(day, selectedDate);
                                 const isCurrentMonth = isSameMonth(day, currentMonth);
                                 const isTodayDate = isToday(day);
