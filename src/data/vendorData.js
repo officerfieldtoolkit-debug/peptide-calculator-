@@ -15,6 +15,22 @@
 
 export const VENDORS = [
     {
+        id: 'apollo-peptides',
+        name: 'Apollo Peptides',
+        logo: '🚀',
+        baseUrl: 'https://apollopeptidesciences.com',
+        affiliateUrl: 'https://apollopeptidesciences.com/?rfsn=8947483.28752f',
+        affiliateProgram: null,
+        rating: 4.9,
+        reviews: 342,
+        shipping: 'Free over $150',
+        shippingDays: '2-4 days',
+        paymentMethods: ['Credit Card', 'Zelle', 'CashApp'],
+        features: ['Third-party tested', 'Fast Shipping', 'High Purity'],
+        priceModifier: 1.0,
+        trusted: true
+    },
+    {
         id: 'peptide-sciences',
         name: 'Peptide Sciences',
         logo: '🧬',

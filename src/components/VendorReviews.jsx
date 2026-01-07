@@ -6,6 +6,7 @@ import styles from './VendorReviews.module.css';
 
 // Verified vendors list
 const vendorsList = [
+    { id: 'apollo-peptides', name: 'Apollo Peptides', website: 'apollopeptidesciences.com', verified: true },
     { id: 'peptide-sciences', name: 'Peptide Sciences', website: 'peptidesciences.com', verified: true },
     { id: 'swiss-chems', name: 'Swiss Chems', website: 'swisschems.com', verified: true },
     { id: 'amino-asylum', name: 'Amino Asylum', website: 'aminoasylum.com', verified: false },
