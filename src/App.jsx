@@ -44,6 +44,12 @@ const InjectionGuide = lazy(() => import('./pages/guides/InjectionGuide'));
 const ForumPage = lazy(() => import('./pages/Forum'));
 const Inventory = lazy(() => import('./pages/Inventory'));
 
+// New feature pages
+const InjectionSites = lazy(() => import('./pages/InjectionSites'));
+const BloodWork = lazy(() => import('./pages/BloodWork'));
+const TitrationPlan = lazy(() => import('./pages/TitrationPlan'));
+const Reviews = lazy(() => import('./pages/Reviews'));
+
 import { initAnalytics } from './lib/analytics';
 import { initSentry } from './lib/sentry';
 import { initializeNativeServices } from './services/nativeService';
@@ -132,6 +138,33 @@ function App() {
                   <Inventory />
                 </Suspense>
               } />
+
+              {/* New Feature Routes */}
+              <Route path="injection-sites" element={
+                <Suspense fallback={<PageLoader type="guide" />}>
+                  <InjectionSites />
+                </Suspense>
+              } />
+              <Route path="blood-work" element={
+                <ProtectedRoute>
+                  <Suspense fallback={<PageLoader type="dashboard" />}>
+                    <BloodWork />
+                  </Suspense>
+                </ProtectedRoute>
+              } />
+              <Route path="titration" element={
+                <ProtectedRoute>
+                  <Suspense fallback={<PageLoader type="calculator" />}>
+                    <TitrationPlan />
+                  </Suspense>
+                </ProtectedRoute>
+              } />
+              <Route path="reviews" element={
+                <Suspense fallback={<PageLoader type="forum" />}>
+                  <Reviews />
+                </Suspense>
+              } />
+
               <Route path="settings" element={
                 <ProtectedRoute>
                   <Settings />

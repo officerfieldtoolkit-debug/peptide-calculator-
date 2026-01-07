@@ -1,0 +1,402 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-lg);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    margin-top: var(--space-xs);
+}
+
+.addBtn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 12px 24px;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-lg);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.addBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.categories {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+}
+
+.categoryBtn {
+    padding: 10px 20px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-transform: capitalize;
+}
+
+.categoryBtn:hover {
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+}
+
+.categoryBtn.active {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+}
+
+.markersGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.markerCard {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.markerCard:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+}
+
+.markerCard.selected {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+.markerHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+}
+
+.markerName {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: var(--radius-full);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status.normal {
+    background: rgba(34, 197, 94, 0.2);
+    color: var(--success);
+}
+
+.status.high {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--error);
+}
+
+.status.low {
+    background: rgba(234, 179, 8, 0.2);
+    color: var(--warning);
+}
+
+.markerValue {
+    margin-bottom: var(--space-xs);
+}
+
+.value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.unit {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-left: var(--space-xs);
+}
+
+.noData {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.markerRange {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.miniChart {
+    margin-top: var(--space-sm);
+    opacity: 0.7;
+}
+
+.detailPanel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.detailPanel h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.markerDesc {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-lg);
+}
+
+.chartContainer {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+}
+
+/* Premium Gate */
+.premiumGate {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: var(--space-xl);
+}
+
+.premiumCard {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    text-align: center;
+    max-width: 500px;
+}
+
+.lockIcon {
+    color: var(--accent-primary);
+    margin-bottom: var(--space-lg);
+    opacity: 0.8;
+}
+
+.premiumCard h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-md);
+}
+
+.premiumCard p {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+}
+
+.premiumCard ul {
+    text-align: left;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xl);
+    padding-left: var(--space-lg);
+}
+
+.premiumCard li {
+    margin-bottom: var(--space-sm);
+}
+
+.premiumCard li::marker {
+    color: var(--accent-primary);
+}
+
+.upgradeBtn {
+    padding: 14px 32px;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-lg);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.upgradeBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Modal */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--space-lg);
+}
+
+.modal {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    max-width: 800px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+}
+
+.formGroup {
+    margin-bottom: var(--space-lg);
+}
+
+.formGroup label {
+    display: block;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xs);
+}
+
+.formGroup input {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+}
+
+.markersInput {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.categorySection {
+    margin-bottom: var(--space-lg);
+}
+
+.categorySection h3 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    text-transform: uppercase;
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.inputGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--space-sm);
+}
+
+.inputItem label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.inputWithUnit {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.inputWithUnit input {
+    flex: 1;
+    padding: 8px;
+    background: var(--bg-input);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.inputWithUnit span {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    min-width: 40px;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+}
+
+.cancelBtn {
+    padding: 12px 24px;
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    color: var(--text-secondary);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.cancelBtn:hover {
+    background: var(--glass-bg);
+}
+
+.saveBtn {
+    padding: 12px 24px;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-lg);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
