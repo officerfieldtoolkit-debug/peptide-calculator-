@@ -174,15 +174,39 @@ const InjectionSiteMap = () => {
             <div className={styles.content}>
                 <div className={styles.bodyContainer}>
                     {/* Body outline SVG */}
+                    {/* Body outline SVG */}
                     <svg viewBox="0 0 100 100" className={styles.bodySvg}>
-                        {/* Simple body outline */}
-                        <ellipse cx="50" cy="12" rx="8" ry="10" className={styles.bodyOutline} /> {/* Head */}
-                        <rect x="42" y="22" width="16" height="4" rx="2" className={styles.bodyOutline} /> {/* Neck */}
-                        <ellipse cx="50" cy="40" rx="18" ry="16" className={styles.bodyOutline} /> {/* Torso */}
-                        <ellipse cx="24" cy="35" rx="6" ry="18" className={styles.bodyOutline} /> {/* Left arm */}
-                        <ellipse cx="76" cy="35" rx="6" ry="18" className={styles.bodyOutline} /> {/* Right arm */}
-                        <ellipse cx="42" cy="72" rx="8" ry="22" className={styles.bodyOutline} /> {/* Left leg */}
-                        <ellipse cx="58" cy="72" rx="8" ry="22" className={styles.bodyOutline} /> {/* Right leg */}
+                        {/* Human Body Figure */}
+                        <g className={styles.bodyGroup}>
+                            {/* Head */}
+                            <circle cx="50" cy="10" r="7" className={styles.bodyOutline} />
+
+                            {/* Torso & Limbs Path */}
+                            <path
+                                d="M 45 18 
+                                   L 30 20 
+                                   C 25 22 22 28 22 45 
+                                   L 28 45 
+                                   C 28 35 32 32 34 32 
+                                   L 34 45 
+                                   C 34 50 30 52 30 58 
+                                   L 32 90 
+                                   L 44 90 
+                                   L 46 65 
+                                   L 54 65 
+                                   L 56 90 
+                                   L 68 90 
+                                   L 70 58 
+                                   C 70 52 66 50 66 45 
+                                   L 66 32 
+                                   C 68 32 72 35 72 45 
+                                   L 78 45 
+                                   C 78 28 75 22 70 20 
+                                   L 55 18 
+                                   Q 50 20 45 18 Z"
+                                className={styles.bodyOutline}
+                            />
+                        </g>
 
                         {/* Injection site markers */}
                         {sites.map((site) => (
@@ -196,7 +220,7 @@ const InjectionSiteMap = () => {
                                 <circle
                                     cx={site.x}
                                     cy={site.y}
-                                    r={6}
+                                    r={8}
                                     className={styles.siteHitArea}
                                 />
                             </g>
