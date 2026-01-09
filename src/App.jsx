@@ -52,6 +52,14 @@ const TitrationPlan = lazy(() => import('./pages/TitrationPlan'));
 const Reviews = lazy(() => import('./pages/Reviews'));
 const AccountSecurity = lazy(() => import('./pages/AccountSecurity'));
 
+// Admin pages (lazy loaded)
+const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'));
+const AdminFeatureFlags = lazy(() => import('./pages/admin/AdminFeatureFlags'));
+const AdminAnnouncements = lazy(() => import('./pages/admin/AdminAnnouncements'));
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const AdminPromoCodes = lazy(() => import('./pages/admin/AdminPromoCodes'));
+const AdminExport = lazy(() => import('./pages/admin/AdminExport'));
+
 import { SessionTimeoutWarning } from './hooks/useSessionTimeout';
 
 import { initAnalytics } from './lib/analytics';
@@ -199,13 +207,19 @@ function App() {
                 </AdminRoute>
               }>
                 <Route index element={<AdminDashboard />} />
+                <Route path="analytics" element={<Suspense fallback={<PageLoader type="dashboard" />}><AdminAnalytics /></Suspense>} />
                 <Route path="peptides" element={<AdminPeptides />} />
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="forum" element={<AdminForum />} />
                 <Route path="reviews" element={<AdminReviews />} />
                 <Route path="prices" element={<AdminPrices />} />
+                <Route path="promo-codes" element={<Suspense fallback={<PageLoader type="dashboard" />}><AdminPromoCodes /></Suspense>} />
                 <Route path="tickets" element={<AdminTickets />} />
+                <Route path="announcements" element={<Suspense fallback={<PageLoader type="dashboard" />}><AdminAnnouncements /></Suspense>} />
+                <Route path="feature-flags" element={<Suspense fallback={<PageLoader type="dashboard" />}><AdminFeatureFlags /></Suspense>} />
                 <Route path="audit-logs" element={<AdminAuditLogs />} />
+                <Route path="export" element={<Suspense fallback={<PageLoader type="dashboard" />}><AdminExport /></Suspense>} />
+                <Route path="settings" element={<Suspense fallback={<PageLoader type="dashboard" />}><AdminSettings /></Suspense>} />
                 <Route path="monitoring" element={<AdminMonitoring />} />
                 <Route path="security" element={<AdminSecurityAudit />} />
               </Route>

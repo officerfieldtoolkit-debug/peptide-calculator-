@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, Users, Database, LogOut, MessageCircle,
-    Activity, Shield, MessageSquare, Star, DollarSign, Menu, X
+    Activity, Shield, MessageSquare, Star, DollarSign, Menu, X,
+    BarChart2, Flag, Megaphone, Settings, Tag, Download
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import styles from './AdminLayout.module.css';
@@ -28,14 +29,20 @@ const AdminLayout = () => {
 
     const navItems = [
         { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true },
+        { path: '/admin/analytics', icon: BarChart2, label: 'Analytics' },
         { path: '/admin/peptides', icon: Database, label: 'Peptides' },
         { path: '/admin/users', icon: Users, label: 'Users' },
         { path: '/admin/forum', icon: MessageSquare, label: 'Forum' },
         { path: '/admin/reviews', icon: Star, label: 'Reviews' },
         { path: '/admin/prices', icon: DollarSign, label: 'Prices' },
+        { path: '/admin/promo-codes', icon: Tag, label: 'Promo Codes' },
         { path: '/admin/tickets', icon: MessageCircle, label: 'Support Tickets' },
+        { path: '/admin/announcements', icon: Megaphone, label: 'Announcements' },
+        { path: '/admin/feature-flags', icon: Flag, label: 'Feature Flags' },
         { path: '/admin/audit-logs', icon: Activity, label: 'Audit Logs' },
-        { path: '/admin/monitoring', icon: Activity, label: 'Monitoring' }, // Icon reused, maybe change later
+        { path: '/admin/export', icon: Download, label: 'Export Data' },
+        { path: '/admin/settings', icon: Settings, label: 'Site Settings' },
+        { path: '/admin/monitoring', icon: Activity, label: 'Monitoring' },
         { path: '/admin/security', icon: Shield, label: 'Security Audit' },
     ];
 
