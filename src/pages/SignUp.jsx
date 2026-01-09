@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { UserPlus, AlertCircle, CheckCircle, Mail } from 'lucide-react';
+import { UserPlus, AlertCircle, CheckCircle, Mail, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import { PasswordStrengthMeter, calculatePasswordStrength } from '../utils/passwordStrength';
 
 const SignUp = () => {
     const [fullName, setFullName] = useState('');
@@ -13,6 +14,7 @@ const SignUp = () => {
     const [success, setSuccess] = useState(false);
     const { signUp } = useAuth();
     const navigate = useNavigate();
+    const passwordStrength = calculatePasswordStrength(password);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -26,8 +28,14 @@ const SignUp = () => {
             return;
         }
 
-        if (password.length < 6) {
-            setError("Password must be at least 6 characters");
+        if (password.length < 8) {
+            setError("Password must be at least 8 characters");
+            setLoading(false);
+            return;
+        }
+
+        if (!passwordStrength.isValid) {
+            setError("Please create a stronger password");
             setLoading(false);
             return;
         }
@@ -174,6 +182,7 @@ const SignUp = () => {
                             required
                             minLength={6}
                         />
+                        <PasswordStrengthMeter password={password} />
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

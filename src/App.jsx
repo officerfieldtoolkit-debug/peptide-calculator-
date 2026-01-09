@@ -50,6 +50,9 @@ const InjectionSites = lazy(() => import('./pages/InjectionSites'));
 const BloodWork = lazy(() => import('./pages/BloodWork'));
 const TitrationPlan = lazy(() => import('./pages/TitrationPlan'));
 const Reviews = lazy(() => import('./pages/Reviews'));
+const AccountSecurity = lazy(() => import('./pages/AccountSecurity'));
+
+import { SessionTimeoutWarning } from './hooks/useSessionTimeout';
 
 import { initAnalytics } from './lib/analytics';
 import { initSentry } from './lib/sentry';
@@ -181,6 +184,13 @@ function App() {
                   <SupportTickets />
                 </ProtectedRoute>
               } />
+              <Route path="account-security" element={
+                <ProtectedRoute>
+                  <Suspense fallback={<PageLoader type="dashboard" />}>
+                    <AccountSecurity />
+                  </Suspense>
+                </ProtectedRoute>
+              } />
 
               {/* Admin Routes - Requires admin role */}
               <Route path="admin" element={
@@ -205,6 +215,7 @@ function App() {
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <SessionTimeoutWarning />
           <PromotionalAuthPopup />
           <CookieConsent />
         </ThemeProvider>
