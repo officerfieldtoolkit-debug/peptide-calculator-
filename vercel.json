@@ -1,4 +1,16 @@
 {
+    "redirects": [
+        {
+            "source": "/tracker",
+            "destination": "/log",
+            "permanent": true
+        },
+        {
+            "source": "/schedule",
+            "destination": "/log",
+            "permanent": true
+        }
+    ],
     "rewrites": [
         {
             "source": "/sitemap.xml",
