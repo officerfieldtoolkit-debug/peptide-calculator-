@@ -28,6 +28,7 @@ import AdminTickets from './components/AdminTickets';
 import AdminAuditLogs from './components/AdminAuditLogs';
 import AdminMonitoring from './components/AdminMonitoring';
 import AdminSecurityAudit from './components/AdminSecurityAudit';
+import AdminDatabaseMetrics from './components/AdminDatabaseMetrics';
 import PromotionalAuthPopup from './components/PromotionalAuthPopup';
 import SEO from './components/SEO';
 import PageLoader from './components/PageLoader';
@@ -240,6 +241,7 @@ function AppRoutes() {
             <Route path="export" element={<Suspense fallback={<PageLoader type="dashboard" />}><AdminExport /></Suspense>} />
             <Route path="settings" element={<Suspense fallback={<PageLoader type="dashboard" />}><AdminSettings /></Suspense>} />
             <Route path="monitoring" element={<AdminMonitoring />} />
+            <Route path="database" element={<AdminDatabaseMetrics />} />
             <Route path="security" element={<AdminSecurityAudit />} />
           </Route>
           <Route path="terms" element={<Terms />} />

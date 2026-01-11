@@ -3,7 +3,7 @@ import { NavLink, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, Users, Database, LogOut, MessageCircle,
     Activity, Shield, MessageSquare, Star, DollarSign, Menu, X,
-    BarChart2, Flag, Megaphone, Settings, Tag, Download
+    BarChart2, Flag, Megaphone, Settings, Tag, Download, HardDrive
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import styles from './AdminLayout.module.css';
@@ -43,6 +43,7 @@ const AdminLayout = () => {
         { path: '/admin/export', icon: Download, label: 'Export Data' },
         { path: '/admin/settings', icon: Settings, label: 'Site Settings' },
         { path: '/admin/monitoring', icon: Activity, label: 'Monitoring' },
+        { path: '/admin/database', icon: HardDrive, label: 'Database Metrics' },
         { path: '/admin/security', icon: Shield, label: 'Security Audit' },
     ];
 
