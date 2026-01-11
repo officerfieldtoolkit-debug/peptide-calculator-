@@ -16,7 +16,7 @@ const BloodWork = () => {
             <SEO
                 title="Blood Work Tracker | Lab Results Monitoring"
                 description="Track your blood work results over time. Monitor IGF-1, testosterone, A1C, liver enzymes, and more with visual trends."
-                keywords="blood work tracker, lab results, IGF-1, testosterone, peptide monitoring"
+                canonical="/blood-work"
             />
             <BloodWorkTracker isPremium={isPremium} />
         </>

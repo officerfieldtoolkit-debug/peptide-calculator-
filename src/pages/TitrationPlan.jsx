@@ -19,7 +19,7 @@ const TitrationPlan = () => {
             <SEO
                 title="Titration Planner | Dose Escalation Schedule"
                 description="Plan your semaglutide, tirzepatide, or peptide dose escalation. Visual timeline with reminders and export options."
-                keywords="titration planner, semaglutide dosing, tirzepatide schedule, dose escalation"
+                canonical="/titration"
             />
             <TitrationPlanner isPremium={isPremium} />
         </>

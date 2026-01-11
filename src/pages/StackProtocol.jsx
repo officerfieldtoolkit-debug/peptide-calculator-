@@ -16,7 +16,7 @@ const StackProtocol = () => {
             <SEO
                 title="Peptide Stack Builder | Interaction Checker"
                 description="Design your custom peptide stack and check for potential interactions, synergies, and conflicts."
-                keywords="peptide stack, interaction checker, stack builder, safety"
+                canonical="/stack-builder"
             />
             <StackBuilder isPremium={isPremium} />
         </div>
