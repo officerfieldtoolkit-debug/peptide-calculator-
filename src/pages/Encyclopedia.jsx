@@ -21,7 +21,7 @@ const Encyclopedia = () => {
 
     const filteredPeptides = useMemo(() => {
         return peptides.filter(peptide => {
-            const matchesSearch = peptide.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            const matchesSearch = (peptide.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
                 (peptide.description && peptide.description.toLowerCase().includes(searchTerm.toLowerCase()));
             const matchesCategory = selectedCategory === 'All' || peptide.category === selectedCategory;
             return matchesSearch && matchesCategory;

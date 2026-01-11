@@ -2,12 +2,14 @@
     "compilerOptions": {
         "allowJs": true,
         "lib": [
-            "deno.window"
+            "deno.window",
+            "deno.ns"
         ],
         "strict": true
     },
     "imports": {
         "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2",
-        "deno_dom": "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts"
+        "deno_dom": "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts",
+        "stripe": "https://esm.sh/stripe@12.18.0?target=deno"
     }
 }

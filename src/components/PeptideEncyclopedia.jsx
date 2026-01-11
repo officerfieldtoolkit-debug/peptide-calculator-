@@ -27,10 +27,15 @@ const PeptideEncyclopedia = () => {
     const filteredPeptides = useMemo(() => {
         const term = searchTerm.toLowerCase();
         return peptides.filter((peptide) => {
+            const name = peptide.name?.toLowerCase() || '';
+            const description = peptide.description?.toLowerCase() || '';
+            const pepCategory = peptide.category?.toLowerCase() || '';
+
             const matchesSearch =
-                peptide.name.toLowerCase().includes(term) ||
-                peptide.description.toLowerCase().includes(term) ||
-                peptide.category.toLowerCase().includes(term);
+                name.includes(term) ||
+                description.includes(term) ||
+                pepCategory.includes(term);
+
             const matchesCategory = category === 'All' || peptide.category === category;
             return matchesSearch && matchesCategory;
         });

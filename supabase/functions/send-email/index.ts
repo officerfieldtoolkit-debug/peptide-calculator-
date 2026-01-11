@@ -2,7 +2,7 @@
 // https://supabase.com/docs/guides/functions
 
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+// import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 
@@ -12,7 +12,7 @@ const corsHeaders = {
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-serve(async (req) => {
+Deno.serve(async (req: Request) => {
     // Handle CORS preflight requests
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
@@ -98,7 +98,7 @@ serve(async (req) => {
         )
     } catch (error) {
         return new Response(
-            JSON.stringify({ error: error.message }),
+            JSON.stringify({ error: (error as Error).message }),
             { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
         )
     }
