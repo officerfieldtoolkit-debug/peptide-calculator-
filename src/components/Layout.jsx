@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, Link } from 'react-router-dom';
 import Navigation from './Navigation';
+import LanguageSelector from './LanguageSelector';
 import { device, statusBar, appEvents } from '../services/nativeService';
 
 const Layout = () => {
@@ -92,6 +93,52 @@ const Layout = () => {
             >
                 Skip to main content
             </a>
+
+            {/* Header with Logo and Language Selector */}
+            <header style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '0.75rem 1rem',
+                background: 'rgba(10, 14, 26, 0.8)',
+                backdropFilter: 'blur(10px)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                position: 'sticky',
+                top: 0,
+                zIndex: 100
+            }}>
+                <Link
+                    to="/"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        textDecoration: 'none',
+                        color: 'var(--text-primary)'
+                    }}
+                >
+                    <img
+                        src="/pwa-192x192.png"
+                        alt="PeptideLog"
+                        style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '8px'
+                        }}
+                    />
+                    <span style={{
+                        fontWeight: 700,
+                        fontSize: '1.125rem',
+                        background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text'
+                    }}>
+                        PeptideLog
+                    </span>
+                </Link>
+                <LanguageSelector variant="compact" />
+            </header>
 
             <main
                 id="main-content"
