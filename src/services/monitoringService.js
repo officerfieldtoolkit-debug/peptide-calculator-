@@ -29,6 +29,20 @@ const LOG_LEVELS = {
 let logBuffer = [];
 const MAX_BUFFER_SIZE = 100;
 
+// Safe stringify to handle circular references
+const safeStringify = (obj, indent = 2) => {
+    const cache = new Set();
+    return JSON.stringify(obj, (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+            if (cache.has(value)) {
+                return '[Circular]';
+            }
+            cache.add(value);
+        }
+        return value;
+    }, indent);
+};
+
 export const monitoringService = {
     /**
      * ========================================
@@ -231,7 +245,7 @@ export const monitoringService = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     text: `🚨 CRITICAL: ${logEntry.message}`,
-                    attachments: [{ text: JSON.stringify(logEntry.context, null, 2) }]
+                    attachments: [{ text: safeStringify(logEntry.context, 2) }]
                 })
             }).catch(() => { }); // Silent fail for webhooks
         }

@@ -40,20 +40,28 @@ export const initSentry = () => {
         ],
 
         // Don't send PII unless necessary
-        beforeSend(event, hint) {
-            // Scrub sensitive data
-            if (event.request?.headers) {
-                delete event.request.headers['Authorization'];
-                delete event.request.headers['Cookie'];
-            }
+        beforeSend(event) {
+            try {
+                // Scrub sensitive data with defensive checks
+                if (event && event.request && event.request.headers) {
+                    delete event.request.headers['Authorization'];
+                    delete event.request.headers['Cookie'];
+                }
 
-            // Don't report errors in development unless explicitly enabled
-            if (!import.meta.env.PROD && !import.meta.env.VITE_SENTRY_DEV) {
-                console.log('[Sentry] Event captured (dev mode, not sent):', event);
-                return null;
-            }
+                // Don't report errors in development unless explicitly enabled
+                if (!import.meta.env.PROD && !import.meta.env.VITE_SENTRY_DEV) {
+                    console.log('[Sentry] Event captured (dev mode, not sent):', event);
+                    return null;
+                }
 
-            return event;
+                return event;
+            } catch (error) {
+                // Log the error but don't let it crash the beforeSend hook
+                console.error('[Sentry] Error in beforeSend hook:', error);
+
+                // Return the original event to ensure it still gets sent
+                return event;
+            }
         },
 
         // Integration configuration
