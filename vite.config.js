@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import Sitemap from 'vite-plugin-sitemap'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 
 // https://vite.dev/config/
 export default defineConfig(async ({ mode }) => {
@@ -87,9 +88,27 @@ export default defineConfig(async ({ mode }) => {
         open: false,
         gzipSize: true,
         brotliSize: true,
-      })
-    ],
+      }),
+      // Sentry source maps upload (only in production builds with auth token)
+      env.SENTRY_AUTH_TOKEN && sentryVitePlugin({
+        org: 'phillips-tectical-technologies',
+        project: 'javascript-react',
+        authToken: env.SENTRY_AUTH_TOKEN,
+        sourcemaps: {
+          // Delete source maps after upload for security
+          filesToDeleteAfterUpload: ['./dist/**/*.map'],
+        },
+        release: {
+          // Use git commit hash or build time as release version
+          name: env.VERCEL_GIT_COMMIT_SHA || `build-${Date.now()}`,
+        },
+        // Suppress warnings in CI
+        silent: !env.DEBUG,
+      }),
+    ].filter(Boolean),
     build: {
+      // Generate source maps for Sentry (they get deleted after upload)
+      sourcemap: true,
       rollupOptions: {
         output: {
           manualChunks: {
